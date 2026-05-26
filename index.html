@@ -4,439 +4,520 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Star Shine — Calculadora de Colorimetría</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#0e0b0f; --surface:#1a1520; --surface2:#241d2c;
-    --border:rgba(255,255,255,0.08); --gold:#c9a84c; --gold-light:#e8c97a;
-    --text:#f0eaf5; --muted:rgba(240,234,245,0.45); --accent:#b06ad4; --green:#6abf8a;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-  body::before{content:'';position:fixed;top:-30%;left:-20%;width:60%;height:60%;background:radial-gradient(circle,rgba(176,106,212,0.12)0%,transparent 70%);pointer-events:none;z-index:0;}
-  body::after{content:'';position:fixed;bottom:-20%;right:-10%;width:50%;height:50%;background:radial-gradient(circle,rgba(201,168,76,0.10)0%,transparent 70%);pointer-events:none;z-index:0;}
-  .container{position:relative;z-index:1;max-width:1150px;margin:0 auto;padding:2rem 1.5rem 4rem;}
+:root {
+  --void:#03020a;
+  --deep:#080616;
+  --panel:#0d0b1e;
+  --panel2:#131028;
+  --border:rgba(80,180,255,0.12);
+  --border2:rgba(80,180,255,0.25);
+  --saber:#00d4ff;
+  --saber2:#0099cc;
+  --gold:#f5c842;
+  --gold2:#e0a800;
+  --rebel:#ff4444;
+  --force:#8844ff;
+  --text:#c8e8ff;
+  --muted:rgba(180,220,255,0.45);
+  --glow:rgba(0,212,255,0.18);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
 
-  /* HEADER */
-  header{text-align:center;padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2.5rem;}
-  .logo-wrap{display:flex;align-items:center;justify-content:center;gap:0.8rem;margin-bottom:0.5rem;}
-  .star-logo{font-size:2.2rem;animation:rotateStar 8s linear infinite;display:inline-block;}
-  @keyframes rotateStar{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-  .logo-tag{font-family:'Cormorant Garamond',serif;font-size:0.72rem;letter-spacing:0.38em;text-transform:uppercase;color:var(--gold);margin-bottom:0.5rem;}
-  header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.6rem,5.5vw,4.2rem);font-weight:300;line-height:1;letter-spacing:-0.01em;}
-  header h1 .shine{color:var(--gold-light);font-style:italic;}
-  header h1 .star-txt{color:#fff;}
-  .header-sub{color:var(--muted);font-size:0.88rem;margin-top:0.6rem;font-weight:300;letter-spacing:0.04em;}
-  .trending-strip{display:flex;gap:0.45rem;flex-wrap:wrap;justify-content:center;margin-top:0.9rem;}
-  .trend-badge{font-size:0.66rem;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:99px;border:1px solid rgba(201,168,76,0.3);color:var(--gold);background:rgba(201,168,76,0.06);cursor:default;}
-  .trend-badge.hot{border-color:rgba(200,80,80,0.4);color:#e88080;background:rgba(200,80,80,0.06);}
-  .trend-badge.new{border-color:rgba(106,191,138,0.4);color:var(--green);background:rgba(106,191,138,0.06);}
+body {
+  font-family:'Exo 2',sans-serif;
+  background:var(--void);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+  position:relative;
+}
 
-  /* GRID */
-  .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
-  @media(max-width:740px){.main-grid{grid-template-columns:1fr;}}
+/* ── STARFIELD ── */
+#starfield{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden;}
+.star{position:absolute;border-radius:50%;animation:twinkle var(--d) ease-in-out infinite var(--delay);}
+@keyframes twinkle{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:1;transform:scale(1.3)}}
 
-  /* CARDS */
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.6rem;}
-  .card-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;letter-spacing:0.04em;color:var(--gold-light);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.5rem;}
-  .card-title .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);}
+/* ── SCANLINES OVERLAY ── */
+body::after{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03)2px,rgba(0,0,0,0.03)4px);pointer-events:none;z-index:1;}
 
-  /* PALETTE */
-  .palette-section{grid-column:1/-1;}
-  .palette-groups{display:flex;flex-direction:column;gap:1.4rem;}
-  .palette-group-header{display:flex;align-items:center;gap:0.7rem;margin-bottom:0.6rem;}
-  .palette-group-label{font-size:0.7rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--muted);}
-  .group-badge{font-size:0.6rem;padding:2px 7px;border-radius:99px;letter-spacing:0.06em;}
-  .group-badge.trending{background:rgba(200,80,80,0.15);color:#e88080;border:1px solid rgba(200,80,80,0.3);}
-  .group-badge.new2025{background:rgba(106,191,138,0.12);color:var(--green);border:1px solid rgba(106,191,138,0.3);}
-  .swatches{display:flex;flex-wrap:wrap;gap:0.55rem;}
-  .swatch{width:46px;height:46px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform 0.18s,border-color 0.18s,box-shadow 0.18s;position:relative;flex-shrink:0;}
-  .swatch:hover{transform:scale(1.18);}
-  .swatch.selected{border-color:#fff;box-shadow:0 0 0 3px rgba(255,255,255,0.22);transform:scale(1.18);}
-  .swatch[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:50%;transform:translateX(-50%);background:#1e1628;color:#fff;font-size:0.68rem;padding:4px 9px;border-radius:7px;white-space:nowrap;pointer-events:none;border:1px solid var(--border);z-index:10;box-shadow:0 4px 16px rgba(0,0,0,0.5);}
+/* ── AMBIENT GLOW ── */
+body::before{content:'';position:fixed;top:-20%;left:50%;transform:translateX(-50%);width:60%;height:50%;background:radial-gradient(ellipse,rgba(0,212,255,0.06)0%,transparent 70%);pointer-events:none;z-index:0;}
 
-  /* TONE DISPLAY */
-  .tone-display{display:flex;align-items:center;gap:1rem;background:var(--surface2);border-radius:10px;padding:1rem;margin-bottom:1rem;}
-  .tone-preview{width:58px;height:58px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;background:#333;transition:background 0.35s;box-shadow:0 0 20px rgba(0,0,0,0.4);}
-  .tone-info h3{font-family:'Cormorant Garamond',serif;font-size:1.15rem;font-weight:400;}
-  .tone-info p{font-size:0.78rem;color:var(--muted);margin-top:2px;}
-  .tone-tags{margin-top:5px;display:flex;gap:4px;flex-wrap:wrap;}
-  .tone-tag{font-size:0.6rem;padding:2px 6px;border-radius:99px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--muted);}
+.container{position:relative;z-index:2;max-width:1160px;margin:0 auto;padding:2rem 1.5rem 5rem;}
 
-  /* INPUTS */
-  label{display:block;font-size:0.78rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:0.4rem;}
-  select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.92rem;padding:0.6rem 0.85rem;outline:none;margin-bottom:1rem;appearance:none;-webkit-appearance:none;transition:border-color 0.2s;}
-  select:focus{border-color:var(--gold);}
-  select option{background:#1a1520;}
+/* ── HEADER ── */
+header{text-align:center;padding:3rem 0 2.5rem;border-bottom:1px solid var(--border2);margin-bottom:2.5rem;position:relative;}
 
-  .suggestion-box{background:linear-gradient(135deg,rgba(176,106,212,0.08),rgba(201,168,76,0.06));border:1px solid rgba(176,106,212,0.2);border-radius:10px;padding:0.85rem 1rem;font-size:0.8rem;color:rgba(240,234,245,0.8);line-height:1.6;margin-bottom:1rem;display:none;}
-  .suggestion-box.visible{display:block;animation:fadeUp 0.3s ease;}
-  .suggestion-box .sug-title{font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--accent);margin-bottom:0.3rem;}
-  .compat-wrap{margin-bottom:1rem;}
-  .compat-label{display:flex;justify-content:space-between;margin-bottom:0.35rem;}
-  .compat-label span:first-child{font-size:0.72rem;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
-  .compat-label span:last-child{font-size:0.78rem;color:var(--gold-light);font-weight:500;}
-  .compat-track{height:5px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
-  .compat-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(.22,.68,0,1.2);background:linear-gradient(90deg,var(--gold),var(--accent));}
+/* Horizontal saber lines */
+header::before,header::after{content:'';position:absolute;bottom:0;height:1px;width:35%;}
+header::before{left:0;background:linear-gradient(90deg,transparent,var(--saber));}
+header::after{right:0;background:linear-gradient(270deg,transparent,var(--saber));}
 
-  .btn-calc{width:100%;background:linear-gradient(135deg,#c9a84c 0%,#e8c97a 50%,#c9a84c 100%);background-size:200% 200%;color:#0e0b0f;border:none;border-radius:10px;padding:0.9rem;font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:500;cursor:pointer;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.3s;animation:shimmer 3s ease infinite;margin-top:0.3rem;}
-  .btn-calc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,0.35);}
-  @keyframes shimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.logo-tag{font-family:'Orbitron',sans-serif;font-size:0.62rem;letter-spacing:0.55em;text-transform:uppercase;color:var(--saber);margin-bottom:1rem;opacity:0.7;}
 
-  /* RESULTS */
-  .result-card{grid-column:1/-1;display:none;animation:fadeUp 0.4s ease;}
-  .result-card.visible{display:block;}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  .result-header{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border);}
-  .result-swatch-large{width:76px;height:76px;border-radius:50%;border:3px solid rgba(255,255,255,0.12);flex-shrink:0;transition:background 0.4s;box-shadow:0 0 30px rgba(0,0,0,0.5);}
-  .result-header-info h2{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:300;}
-  .result-header-info p{font-size:0.82rem;color:var(--muted);margin-top:3px;}
-  .formula-title{font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:0.9rem;}
-  .formula-rows{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;}
-  .formula-row{display:flex;align-items:center;gap:0.9rem;background:var(--surface2);border-radius:10px;padding:0.75rem 1rem;}
-  .formula-color-dot{width:36px;height:36px;border-radius:50%;flex-shrink:0;border:1px solid rgba(255,255,255,0.12);}
-  .formula-text{flex:1;}
-  .formula-text .fname{font-size:0.9rem;font-weight:500;}
-  .formula-text .fcode{font-size:0.75rem;color:var(--muted);}
-  .formula-pct{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:300;color:var(--gold-light);min-width:52px;text-align:right;}
-  .formula-bar-wrap{width:80px;height:6px;background:rgba(255,255,255,0.08);border-radius:99px;overflow:hidden;}
-  .formula-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold),var(--accent));transition:width 0.6s cubic-bezier(.22,.68,0,1.2);}
-  .oxid-info{background:var(--surface2);border-radius:10px;padding:1rem 1.1rem;display:flex;align-items:center;gap:0.9rem;border-left:3px solid var(--gold);}
-  .oxid-icon{font-size:1.5rem;}
-  .oxid-text h4{font-size:0.9rem;}
-  .oxid-text p{font-size:0.77rem;color:var(--muted);margin-top:2px;}
-  .amounts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;margin-top:1.2rem;}
-  .amount-cell{background:var(--surface2);border-radius:8px;padding:0.75rem;text-align:center;}
-  .amount-cell .av{font-family:'Cormorant Garamond',serif;font-size:1.4rem;color:var(--gold-light);}
-  .amount-cell .al{font-size:0.7rem;color:var(--muted);margin-top:2px;}
-  .pro-panel{margin-top:1.2rem;background:linear-gradient(135deg,rgba(106,191,138,0.06),rgba(201,168,76,0.06));border:1px solid rgba(106,191,138,0.18);border-radius:12px;padding:1rem 1.1rem;}
-  .pro-panel-title{font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--green);margin-bottom:0.7rem;}
-  .pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
-  .pro-item{background:rgba(0,0,0,0.2);border-radius:8px;padding:0.6rem 0.8rem;}
-  .pro-item .pi-label{font-size:0.65rem;color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:2px;}
-  .pro-item .pi-val{font-size:0.85rem;color:var(--text);}
-  .sep{height:1px;background:var(--border);margin:1.2rem 0;}
-  .tip-box{background:rgba(176,106,212,0.08);border:1px solid rgba(176,106,212,0.2);border-radius:10px;padding:0.9rem 1rem;font-size:0.82rem;color:rgba(240,234,245,0.75);line-height:1.6;}
-  .tip-box strong{color:var(--accent);}
-  .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted);font-size:0.88rem;}
-  .empty-state .icon{font-size:2.5rem;margin-bottom:0.6rem;}
-  .tag{display:inline-block;font-size:0.68rem;padding:2px 8px;border-radius:99px;border:1px solid var(--border);color:var(--muted);letter-spacing:0.06em;margin-left:0.5rem;vertical-align:middle;}
+.logo-wrap{display:flex;align-items:center;justify-content:center;gap:1rem;margin-bottom:0.6rem;}
 
-  /* ============ ESTRELLA DE COLOR ============ */
-  .star-section{grid-column:1/-1;}
-  .color-star-wrap{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;}
-  .star-svg-container{flex-shrink:0;position:relative;width:320px;height:320px;}
-  .star-svg-container svg{width:100%;height:100%;}
+.star-icon{font-size:1.8rem;color:var(--gold);animation:rotateStar 12s linear infinite;display:inline-block;text-shadow:0 0 20px var(--gold2);}
+.star-icon.rev{animation-direction:reverse;}
+@keyframes rotateStar{to{transform:rotate(360deg)}}
 
-  /* Segmentos interactivos */
-  .star-seg{cursor:pointer;transition:opacity 0.2s,filter 0.2s;}
-  .star-seg:hover{filter:brightness(1.25);}
-  .star-seg.active-seg{filter:brightness(1.4) drop-shadow(0 0 8px currentColor);}
+header h1{font-family:'Orbitron',sans-serif;font-size:clamp(2.2rem,5.5vw,4rem);font-weight:900;line-height:1;letter-spacing:0.08em;text-transform:uppercase;}
+header h1 .sw{color:#fff;text-shadow:0 0 30px rgba(255,255,255,0.4);}
+header h1 .shine{color:var(--gold);text-shadow:0 0 25px var(--gold2),0 0 50px rgba(245,200,66,0.3);}
 
-  /* Panel derecho */
-  .star-info-panel{flex:1;min-width:260px;}
-  .neutralizer-result{background:var(--surface2);border-radius:12px;padding:1.2rem;margin-top:0;min-height:180px;display:flex;flex-direction:column;gap:0.8rem;}
-  .neut-placeholder{color:var(--muted);font-size:0.85rem;text-align:center;margin:auto;line-height:1.7;}
-  .neut-title{font-family:'Cormorant Garamond',serif;font-size:1.1rem;font-weight:400;color:var(--gold-light);}
-  .neut-pair{display:flex;align-items:center;gap:1rem;}
-  .neut-dot{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,255,255,0.15);flex-shrink:0;}
-  .neut-arrow{font-size:1.3rem;color:var(--muted);}
-  .neut-text h4{font-size:0.92rem;font-weight:500;}
-  .neut-text p{font-size:0.76rem;color:var(--muted);margin-top:2px;}
-  .neut-formula{background:rgba(0,0,0,0.25);border-radius:8px;padding:0.7rem 0.9rem;font-size:0.82rem;line-height:1.65;border-left:3px solid var(--accent);}
-  .neut-formula strong{color:var(--gold-light);}
+.header-sub{color:var(--muted);font-size:0.85rem;margin-top:0.7rem;letter-spacing:0.12em;text-transform:uppercase;}
 
-  .error-selector{margin-bottom:1rem;}
-  .error-selector label{margin-bottom:0.5rem;}
-  .color-buttons{display:flex;flex-wrap:wrap;gap:0.45rem;}
-  .col-btn{padding:5px 12px;border-radius:99px;border:1.5px solid var(--border);background:transparent;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.76rem;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:6px;}
-  .col-btn:hover{border-color:rgba(255,255,255,0.3);background:rgba(255,255,255,0.05);}
-  .col-btn.active{border-color:#fff;background:rgba(255,255,255,0.1);}
-  .col-btn .cb-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0;}
+/* Crawl text effect */
+.epcrawl{font-family:'Orbitron',sans-serif;font-size:0.62rem;letter-spacing:0.2em;color:var(--gold);opacity:0.6;margin-top:0.6rem;text-transform:uppercase;}
 
-  .star-legend{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem;}
-  .legend-item{display:flex;align-items:center;gap:5px;font-size:0.7rem;color:var(--muted);}
-  .legend-dot{width:10px;height:10px;border-radius:50%;}
+.trending-strip{display:flex;gap:0.45rem;flex-wrap:wrap;justify-content:center;margin-top:1rem;}
+.trend-badge{font-family:'Orbitron',sans-serif;font-size:0.58rem;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:3px;border:1px solid rgba(0,212,255,0.3);color:var(--saber);background:rgba(0,212,255,0.05);}
+.trend-badge.hot{border-color:rgba(255,68,68,0.4);color:#ff8888;background:rgba(255,68,68,0.06);}
+.trend-badge.new{border-color:rgba(136,68,255,0.4);color:#bb88ff;background:rgba(136,68,255,0.06);}
 
-  footer{text-align:center;margin-top:3rem;font-size:0.75rem;color:var(--muted);letter-spacing:0.05em;}
+/* ── GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;}
+@media(max-width:740px){.main-grid{grid-template-columns:1fr;}}
+
+/* ── CARDS ── */
+.card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:1.6rem;
+  position:relative;
+  overflow:hidden;
+}
+/* Corner accents */
+.card::before,.card::after{content:'';position:absolute;width:12px;height:12px;}
+.card::before{top:-1px;left:-1px;border-top:2px solid var(--saber);border-left:2px solid var(--saber);}
+.card::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--saber);border-right:2px solid var(--saber);}
+
+.card-title{
+  font-family:'Orbitron',sans-serif;font-size:0.72rem;font-weight:600;
+  letter-spacing:0.2em;color:var(--saber);margin-bottom:1.2rem;
+  text-transform:uppercase;display:flex;align-items:center;gap:0.6rem;
+}
+.card-title .dot{width:6px;height:6px;background:var(--saber);transform:rotate(45deg);flex-shrink:0;box-shadow:0 0 8px var(--saber);}
+
+/* ── PALETTE ── */
+.palette-section{grid-column:1/-1;}
+.palette-groups{display:flex;flex-direction:column;gap:1.4rem;}
+.palette-group-header{display:flex;align-items:center;gap:0.7rem;margin-bottom:0.6rem;}
+.palette-group-label{font-family:'Orbitron',sans-serif;font-size:0.58rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);}
+.group-badge{font-family:'Orbitron',sans-serif;font-size:0.55rem;padding:2px 7px;border-radius:2px;letter-spacing:0.06em;}
+.group-badge.trending{background:rgba(255,68,68,0.12);color:#ff9090;border:1px solid rgba(255,68,68,0.3);}
+.group-badge.new2025{background:rgba(136,68,255,0.1);color:#cc99ff;border:1px solid rgba(136,68,255,0.3);}
+
+.swatches{display:flex;flex-wrap:wrap;gap:0.5rem;}
+.swatch{
+  width:44px;height:44px;border-radius:3px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.08);
+  transition:transform 0.18s,box-shadow 0.18s,border-color 0.18s;
+  position:relative;flex-shrink:0;
+}
+.swatch:hover{transform:scale(1.2) rotate(3deg);box-shadow:0 0 14px rgba(0,212,255,0.4);border-color:var(--saber);}
+.swatch.selected{border:2px solid var(--saber);box-shadow:0 0 16px var(--saber),0 0 30px rgba(0,212,255,0.3);transform:scale(1.15);}
+.swatch[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--deep);color:var(--text);font-family:'Exo 2',sans-serif;font-size:0.68rem;padding:4px 10px;border-radius:3px;white-space:nowrap;pointer-events:none;border:1px solid var(--border2);z-index:20;box-shadow:0 4px 20px rgba(0,0,0,0.7);}
+
+/* ── TONE DISPLAY ── */
+.tone-display{display:flex;align-items:center;gap:1rem;background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:1rem;margin-bottom:1rem;}
+.tone-preview{width:56px;height:56px;border-radius:3px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;background:#1a1a2e;transition:background 0.3s;box-shadow:inset 0 0 15px rgba(0,0,0,0.5);}
+.tone-info h3{font-family:'Orbitron',sans-serif;font-size:0.82rem;font-weight:600;letter-spacing:0.06em;color:var(--text);}
+.tone-info p{font-size:0.75rem;color:var(--muted);margin-top:3px;}
+.tone-tags{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap;}
+.tone-tag{font-family:'Orbitron',sans-serif;font-size:0.55rem;padding:2px 7px;border-radius:2px;background:rgba(0,212,255,0.08);border:1px solid var(--border);color:var(--muted);}
+
+/* ── INPUTS ── */
+label{display:block;font-family:'Orbitron',sans-serif;font-size:0.62rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.4rem;}
+select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:3px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:0.88rem;padding:0.55rem 0.85rem;outline:none;margin-bottom:1rem;appearance:none;-webkit-appearance:none;transition:border-color 0.2s;}
+select:focus{border-color:var(--saber);box-shadow:0 0 8px rgba(0,212,255,0.2);}
+select option{background:#0d0b1e;}
+
+/* ── SUGGESTION / COMPAT ── */
+.suggestion-box{background:rgba(136,68,255,0.06);border:1px solid rgba(136,68,255,0.2);border-radius:4px;padding:0.85rem 1rem;font-size:0.8rem;line-height:1.6;margin-bottom:1rem;display:none;}
+.suggestion-box.visible{display:block;animation:fadeUp 0.3s ease;}
+.suggestion-box .sug-title{font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:#cc99ff;margin-bottom:0.3rem;}
+.compat-wrap{margin-bottom:1rem;}
+.compat-label{display:flex;justify-content:space-between;margin-bottom:0.35rem;}
+.compat-label span:first-child{font-family:'Orbitron',sans-serif;font-size:0.6rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;}
+.compat-label span:last-child{font-size:0.78rem;color:var(--saber);font-weight:500;}
+.compat-track{height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden;}
+.compat-fill{height:100%;border-radius:99px;transition:width 0.5s cubic-bezier(.22,.68,0,1.2);background:linear-gradient(90deg,var(--saber2),var(--saber),var(--force));}
+
+/* ── BUTTON ── */
+.btn-calc{
+  width:100%;
+  background:transparent;
+  border:1px solid var(--saber);
+  border-radius:3px;
+  padding:0.9rem;
+  font-family:'Orbitron',sans-serif;
+  font-size:0.75rem;
+  font-weight:700;
+  letter-spacing:0.2em;
+  text-transform:uppercase;
+  color:var(--saber);
+  cursor:pointer;
+  transition:all 0.25s;
+  position:relative;
+  overflow:hidden;
+  margin-top:0.3rem;
+}
+.btn-calc::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,212,255,0.15),transparent);transition:left 0.4s;}
+.btn-calc:hover{background:rgba(0,212,255,0.08);box-shadow:0 0 20px rgba(0,212,255,0.35),inset 0 0 20px rgba(0,212,255,0.05);color:#fff;}
+.btn-calc:hover::before{left:100%;}
+
+/* ── RESULTS ── */
+.result-card{grid-column:1/-1;display:none;animation:fadeUp 0.4s ease;}
+.result-card.visible{display:block;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.result-header{display:flex;align-items:center;gap:1.2rem;margin-bottom:1.5rem;padding-bottom:1.2rem;border-bottom:1px solid var(--border);}
+.result-swatch-large{width:72px;height:72px;border-radius:4px;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;transition:background 0.4s;box-shadow:0 0 20px rgba(0,0,0,0.5);}
+.result-header-info h2{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:0.08em;color:#fff;}
+.result-header-info p{font-size:0.78rem;color:var(--muted);margin-top:4px;font-family:'Orbitron',sans-serif;letter-spacing:0.08em;}
+
+.formula-title{font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold);margin-bottom:0.9rem;}
+.formula-rows{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.5rem;}
+.formula-row{display:flex;align-items:center;gap:0.9rem;background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:0.75rem 1rem;}
+.formula-color-dot{width:34px;height:34px;border-radius:3px;flex-shrink:0;border:1px solid rgba(255,255,255,0.1);}
+.formula-text{flex:1;}
+.formula-text .fname{font-size:0.88rem;font-weight:500;color:var(--text);}
+.formula-text .fcode{font-size:0.72rem;color:var(--muted);margin-top:1px;}
+.formula-pct{font-family:'Orbitron',sans-serif;font-size:1.4rem;font-weight:700;color:var(--saber);min-width:50px;text-align:right;text-shadow:0 0 10px rgba(0,212,255,0.4);}
+.formula-bar-wrap{width:70px;height:4px;background:rgba(255,255,255,0.07);border-radius:99px;overflow:hidden;}
+.formula-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--saber2),var(--saber));transition:width 0.6s cubic-bezier(.22,.68,0,1.2);}
+
+.oxid-info{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:1rem 1.1rem;display:flex;align-items:center;gap:0.9rem;border-left:3px solid var(--gold);}
+.oxid-icon{font-size:1.4rem;}
+.oxid-text h4{font-family:'Orbitron',sans-serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--gold);}
+.oxid-text p{font-size:0.75rem;color:var(--muted);margin-top:3px;}
+
+.amounts-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.7rem;margin-top:1.2rem;}
+.amount-cell{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:0.75rem;text-align:center;}
+.amount-cell .av{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--gold);}
+.amount-cell .al{font-family:'Orbitron',sans-serif;font-size:0.58rem;color:var(--muted);margin-top:3px;letter-spacing:0.1em;text-transform:uppercase;}
+
+.pro-panel{margin-top:1.2rem;background:rgba(0,212,255,0.03);border:1px solid rgba(0,212,255,0.1);border-radius:4px;padding:1rem 1.1rem;}
+.pro-panel-title{font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--saber);margin-bottom:0.7rem;}
+.pro-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+.pro-item{background:rgba(0,0,0,0.25);border-radius:3px;padding:0.6rem 0.8rem;}
+.pro-item .pi-label{font-family:'Orbitron',sans-serif;font-size:0.55rem;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}
+.pro-item .pi-val{font-size:0.82rem;color:var(--text);}
+
+.sep{height:1px;background:var(--border);margin:1.2rem 0;}
+.tip-box{background:rgba(136,68,255,0.06);border:1px solid rgba(136,68,255,0.15);border-left:3px solid var(--force);border-radius:4px;padding:0.9rem 1rem;font-size:0.82rem;color:rgba(200,232,255,0.75);line-height:1.65;}
+.tip-box strong{color:#cc99ff;}
+
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--muted);font-size:0.85rem;}
+.empty-state .icon{font-size:3rem;margin-bottom:0.8rem;color:var(--saber);text-shadow:0 0 20px var(--saber);display:block;}
+.empty-state p{font-family:'Orbitron',sans-serif;font-size:0.65rem;letter-spacing:0.12em;text-transform:uppercase;line-height:2;}
+
+.tag{display:inline-block;font-family:'Orbitron',sans-serif;font-size:0.58rem;padding:2px 8px;border-radius:2px;border:1px solid var(--border);color:var(--muted);letter-spacing:0.08em;margin-left:0.5rem;}
+
+/* ── ESTRELLA DE COLOR ── */
+.star-section{grid-column:1/-1;}
+.color-star-wrap{display:flex;gap:2rem;align-items:flex-start;flex-wrap:wrap;}
+.star-svg-container{flex-shrink:0;position:relative;width:320px;height:320px;}
+.star-svg-container svg{width:100%;height:100%;}
+.star-seg{cursor:pointer;transition:opacity 0.15s,filter 0.15s;}
+.star-seg:hover{filter:brightness(1.3) saturate(1.3);}
+.star-seg.active-seg{filter:brightness(1.5) drop-shadow(0 0 10px rgba(255,255,255,0.6));}
+.star-intro{font-size:0.8rem;color:var(--muted);margin-bottom:1.4rem;line-height:1.7;font-family:'Exo 2',sans-serif;}
+
+.star-info-panel{flex:1;min-width:260px;}
+.neutralizer-result{background:var(--panel2);border:1px solid var(--border);border-radius:4px;padding:1.2rem;min-height:200px;display:flex;flex-direction:column;gap:0.8rem;}
+.neut-placeholder{color:var(--muted);font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.12em;text-align:center;margin:auto;line-height:2.2;text-transform:uppercase;}
+.neut-title{font-family:'Orbitron',sans-serif;font-size:0.78rem;font-weight:700;color:var(--saber);letter-spacing:0.1em;}
+.neut-pair{display:flex;align-items:center;gap:1rem;}
+.neut-dot{width:44px;height:44px;border-radius:3px;border:1px solid rgba(255,255,255,0.12);flex-shrink:0;}
+.neut-arrow{font-size:1.5rem;color:var(--saber);text-shadow:0 0 10px var(--saber);}
+.neut-text h4{font-family:'Orbitron',sans-serif;font-size:0.72rem;letter-spacing:0.06em;color:var(--text);}
+.neut-text p{font-size:0.73rem;color:var(--muted);margin-top:2px;}
+.neut-formula{background:rgba(0,0,0,0.3);border-radius:3px;padding:0.7rem 0.9rem;font-size:0.8rem;line-height:1.65;border-left:3px solid var(--force);}
+.neut-formula strong{color:var(--gold);}
+
+.error-selector{margin-bottom:1rem;}
+.color-buttons{display:flex;flex-wrap:wrap;gap:0.4rem;}
+.col-btn{padding:4px 10px;border-radius:2px;border:1px solid var(--border);background:transparent;color:var(--text);font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.06em;cursor:pointer;transition:all 0.18s;display:flex;align-items:center;gap:6px;}
+.col-btn:hover{border-color:var(--saber);background:rgba(0,212,255,0.06);}
+.col-btn.active{border-color:var(--saber);background:rgba(0,212,255,0.1);color:var(--saber);box-shadow:0 0 8px rgba(0,212,255,0.2);}
+.col-btn .cb-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+
+.star-legend{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1rem;}
+.legend-item{display:flex;align-items:center;gap:5px;font-family:'Orbitron',sans-serif;font-size:0.58rem;color:var(--muted);letter-spacing:0.05em;}
+.legend-dot{width:9px;height:9px;border-radius:2px;}
+
+footer{text-align:center;margin-top:3rem;font-family:'Orbitron',sans-serif;font-size:0.62rem;color:rgba(0,212,255,0.3);letter-spacing:0.2em;text-transform:uppercase;}
+footer .saber-line{width:180px;height:1px;background:linear-gradient(90deg,transparent,var(--saber),transparent);margin:0.8rem auto;}
 </style>
 </head>
 <body>
+
+<!-- STARFIELD -->
+<div id="starfield"></div>
+
 <div class="container">
 
+<!-- HEADER -->
 <header>
-  <div class="logo-tag">✦ Colorimetría Profesional Capilar</div>
+  <div class="logo-tag">✦ — Sistema de Colorimetría Profesional — ✦</div>
   <div class="logo-wrap">
-    <span class="star-logo">✦</span>
-    <h1><span class="star-txt">Star</span> <span class="shine">Shine</span></h1>
-    <span class="star-logo" style="animation-direction:reverse">✦</span>
+    <span class="star-icon">✦</span>
+    <h1><span class="sw">Star</span>&nbsp;<span class="shine">Shine</span></h1>
+    <span class="star-icon rev">✦</span>
   </div>
-  <p class="header-sub">Calculadora avanzada de mezclas, porcentajes y neutralización de color</p>
+  <p class="header-sub">Calculadora avanzada · Mezclas · Neutralización · Fórmulas</p>
+  <p class="epcrawl">— En una galaxia de color, muy muy lejana —</p>
   <div class="trending-strip">
-    <span class="trend-badge hot">🔥 Trending 2025</span>
+    <span class="trend-badge hot">⚡ Trending 2025</span>
     <span class="trend-badge new">✦ Miel Dorado</span>
     <span class="trend-badge new">✦ Marrón Chocolate</span>
     <span class="trend-badge new">✦ Gris Perla</span>
     <span class="trend-badge">✦ Rubio Mantequilla</span>
     <span class="trend-badge">✦ Strawberry Blonde</span>
-    <span class="trend-badge hot">🔥 Brunette Rosado</span>
+    <span class="trend-badge hot">⚡ Brunette Rosado</span>
   </div>
 </header>
 
 <div class="main-grid">
 
-  <!-- PALETA -->
-  <div class="card palette-section">
-    <div class="card-title"><span class="dot"></span> Paleta de Tonos — Elige el color deseado</div>
-    <div class="palette-groups" id="paletteGroups"></div>
-  </div>
+<!-- PALETA -->
+<div class="card palette-section">
+  <div class="card-title"><span class="dot"></span>Paleta de Tonos — Elige tu color</div>
+  <div class="palette-groups" id="paletteGroups"></div>
+</div>
 
-  <!-- CONFIG CLIENTE -->
-  <div class="card">
-    <div class="card-title"><span class="dot"></span> Configuración del Cliente</div>
-    <div class="tone-display">
-      <div class="tone-preview" id="selPreview"></div>
-      <div class="tone-info">
-        <h3 id="selName">Selecciona un tono</h3>
-        <p id="selDesc">— Haz clic en un color de la paleta</p>
-        <div class="tone-tags" id="selTags"></div>
+<!-- CONFIG CLIENTE -->
+<div class="card">
+  <div class="card-title"><span class="dot"></span>Configuración del Cliente</div>
+  <div class="tone-display">
+    <div class="tone-preview" id="selPreview"></div>
+    <div class="tone-info">
+      <h3 id="selName">Selecciona un tono</h3>
+      <p id="selDesc">— Haz clic en la paleta</p>
+      <div class="tone-tags" id="selTags"></div>
+    </div>
+  </div>
+  <div class="compat-wrap" id="compatWrap" style="display:none">
+    <div class="compat-label"><span>Compatibilidad con base</span><span id="compatPct">—</span></div>
+    <div class="compat-track"><div class="compat-fill" id="compatFill" style="width:0%"></div></div>
+  </div>
+  <div class="suggestion-box" id="suggBox">
+    <div class="sug-title">⚡ Transmisión del sistema</div>
+    <span id="suggText"></span>
+  </div>
+  <label>Tono base del cabello (actual)</label>
+  <select id="baseHair" onchange="onBaseChange()">
+    <option value="">— Seleccionar —</option>
+    <option value="1">1 — Negro</option>
+    <option value="2">2 — Castaño muy oscuro</option>
+    <option value="3">3 — Castaño oscuro</option>
+    <option value="4">4 — Castaño medio</option>
+    <option value="5">5 — Castaño claro</option>
+    <option value="6">6 — Rubio oscuro</option>
+    <option value="7">7 — Rubio medio</option>
+    <option value="8">8 — Rubio claro</option>
+    <option value="9">9 — Rubio muy claro</option>
+    <option value="10">10 — Rubio platino</option>
+  </select>
+  <label>Porcentaje de canas</label>
+  <select id="grays" onchange="onBaseChange()">
+    <option value="0">Sin canas</option>
+    <option value="25">25% — Pocas canas</option>
+    <option value="50">50% — Mitad canas</option>
+    <option value="75">75% — Mayoría canas</option>
+    <option value="100">100% — Totalmente blanco</option>
+  </select>
+  <button class="btn-calc" onclick="calculate()">◈ — CALCULAR FÓRMULA — ◈</button>
+</div>
+
+<!-- PARAMS -->
+<div class="card">
+  <div class="card-title"><span class="dot"></span>Parámetros de Aplicación</div>
+  <label>Técnica de aplicación</label>
+  <select id="technique">
+    <option value="full">Coloración completa</option>
+    <option value="roots">Solo raíces</option>
+    <option value="balayage">Balayage / Mechas</option>
+    <option value="gloss">Gloss / Baño de color</option>
+    <option value="toner">Toner (sobre decolorado)</option>
+    <option value="highlights">Highlights con papel</option>
+    <option value="ombre">Ombré / Degradé</option>
+  </select>
+  <label>Línea de tinte</label>
+  <select id="brand">
+    <option value="generic">Genérica / Universal</option>
+    <option value="wella">Wella Koleston Perfect</option>
+    <option value="loreal">L'Oréal Majirel</option>
+    <option value="igora">Schwarzkopf Igora Royal</option>
+    <option value="redken">Redken Chromatics</option>
+    <option value="matrix">Matrix SoColor</option>
+    <option value="keune">Keune Tinta</option>
+  </select>
+  <label>Tiempo de exposición</label>
+  <select id="time">
+    <option value="35">35 min — Estándar con calor</option>
+    <option value="45">45 min — Mayor cobertura canas</option>
+    <option value="30">30 min — Estándar sin calor</option>
+    <option value="20">20 min — Semipermanente</option>
+    <option value="10">10 min — Toner expreso</option>
+  </select>
+  <label>Tipo de cabello</label>
+  <select id="hairType">
+    <option value="normal">Normal</option>
+    <option value="poroso">Poroso / Dañado</option>
+    <option value="resistente">Resistente / Grueso</option>
+    <option value="fino">Fino / Delicado</option>
+    <option value="rizado">Rizado / Afro</option>
+  </select>
+</div>
+
+<!-- RESULTADO -->
+<div class="card result-card" id="resultCard">
+  <div class="card-title"><span class="dot"></span>Fórmula Calculada <span class="tag">Output</span></div>
+  <div class="result-header">
+    <div class="result-swatch-large" id="resColor"></div>
+    <div class="result-header-info">
+      <h2 id="resName">—</h2>
+      <p id="resDesc">—</p>
+    </div>
+  </div>
+  <div class="formula-title">◈ Composición de la Mezcla</div>
+  <div class="formula-rows" id="formulaRows"></div>
+  <div class="oxid-info">
+    <div class="oxid-icon">⚗</div>
+    <div class="oxid-text">
+      <h4 id="oxidTitle">Oxidante recomendado</h4>
+      <p id="oxidDesc">—</p>
+    </div>
+  </div>
+  <div class="amounts-grid" id="amountsGrid"></div>
+  <div class="pro-panel">
+    <div class="pro-panel-title">◈ Datos Profesionales</div>
+    <div class="pro-grid" id="proGrid"></div>
+  </div>
+  <div class="sep"></div>
+  <div class="tip-box" id="tipBox">—</div>
+</div>
+
+<!-- EMPTY -->
+<div class="card result-card visible" id="emptyCard" style="grid-column:1/-1;">
+  <div class="empty-state">
+    <span class="icon">✦</span>
+    <p>Selecciona un tono · configura el cliente<br>y activa la fórmula</p>
+  </div>
+</div>
+
+<!-- ESTRELLA DE COLOR -->
+<div class="card star-section">
+  <div class="card-title"><span class="dot"></span>Estrella de Color — Neutralización de Errores</div>
+  <p class="star-intro">La rueda cromática muestra colores opuestos. Selecciona el color no deseado que apareció para obtener el neutralizador exacto y la fórmula de corrección.</p>
+  <div class="color-star-wrap">
+    <div class="star-svg-container">
+      <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" id="colorStarSvg">
+        <defs>
+          <filter id="sglow"><feGaussianBlur stdDeviation="4" result="cb"/><feMerge><feMergeNode in="cb"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+
+        <!-- Ring background -->
+        <circle cx="160" cy="160" r="122" fill="none" stroke="rgba(0,212,255,0.08)" stroke-width="1"/>
+        <circle cx="160" cy="160" r="60" fill="none" stroke="rgba(0,212,255,0.08)" stroke-width="1"/>
+
+        <!-- 12 segments -->
+        <path class="star-seg" id="seg-amarillo" data-color="amarillo" d="M160,160 L160,40 A120,120 0 0,1 220,55 Z" fill="#f5d800" opacity="0.85"/>
+        <path class="star-seg" id="seg-amarillo-naranja" data-color="amarillo-naranja" d="M160,160 L220,55 A120,120 0 0,1 270,110 Z" fill="#f5a000" opacity="0.85"/>
+        <path class="star-seg" id="seg-naranja" data-color="naranja" d="M160,160 L270,110 A120,120 0 0,1 280,160 Z" fill="#f07000" opacity="0.85"/>
+        <path class="star-seg" id="seg-naranja-rojo" data-color="naranja-rojo" d="M160,160 L280,160 A120,120 0 0,1 270,210 Z" fill="#d83000" opacity="0.85"/>
+        <path class="star-seg" id="seg-rojo" data-color="rojo" d="M160,160 L270,210 A120,120 0 0,1 220,265 Z" fill="#c01818" opacity="0.85"/>
+        <path class="star-seg" id="seg-rojo-violeta" data-color="rojo-violeta" d="M160,160 L220,265 A120,120 0 0,1 160,280 Z" fill="#9010a0" opacity="0.85"/>
+        <path class="star-seg" id="seg-violeta" data-color="violeta" d="M160,160 L160,280 A120,120 0 0,1 100,265 Z" fill="#6010c8" opacity="0.85"/>
+        <path class="star-seg" id="seg-violeta-azul" data-color="violeta-azul" d="M160,160 L100,265 A120,120 0 0,1 50,210 Z" fill="#2838c8" opacity="0.85"/>
+        <path class="star-seg" id="seg-azul" data-color="azul" d="M160,160 L50,210 A120,120 0 0,1 40,160 Z" fill="#1850e0" opacity="0.85"/>
+        <path class="star-seg" id="seg-azul-verde" data-color="azul-verde" d="M160,160 L40,160 A120,120 0 0,1 50,110 Z" fill="#0090a0" opacity="0.85"/>
+        <path class="star-seg" id="seg-verde" data-color="verde" d="M160,160 L50,110 A120,120 0 0,1 100,55 Z" fill="#20a030" opacity="0.85"/>
+        <path class="star-seg" id="seg-verde-amarillo" data-color="verde-amarillo" d="M160,160 L100,55 A120,120 0 0,1 160,40 Z" fill="#90c000" opacity="0.85"/>
+
+        <!-- Center hub (Star Wars style) -->
+        <circle cx="160" cy="160" r="30" fill="#0d0b1e" stroke="rgba(0,212,255,0.4)" stroke-width="1"/>
+        <circle cx="160" cy="160" r="22" fill="#080616" stroke="rgba(0,212,255,0.2)" stroke-width="0.5"/>
+        <text x="160" y="154" text-anchor="middle" fill="#00d4ff" font-size="9" font-family="Orbitron,sans-serif" font-weight="700" letter-spacing="2">STAR</text>
+        <text x="160" y="167" text-anchor="middle" fill="#f5c842" font-size="8" font-family="Orbitron,sans-serif" letter-spacing="1">SHINE</text>
+
+        <!-- Dashed opposition lines -->
+        <line x1="160" y1="44" x2="160" y2="276" stroke="rgba(0,212,255,0.07)" stroke-width="1" stroke-dasharray="3,4"/>
+        <line x1="44" y1="160" x2="276" y2="160" stroke="rgba(0,212,255,0.07)" stroke-width="1" stroke-dasharray="3,4"/>
+        <line x1="78" y1="78" x2="242" y2="242" stroke="rgba(0,212,255,0.05)" stroke-width="1" stroke-dasharray="3,4"/>
+        <line x1="242" y1="78" x2="78" y2="242" stroke="rgba(0,212,255,0.05)" stroke-width="1" stroke-dasharray="3,4"/>
+        <line x1="103" y1="50" x2="217" y2="270" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3,4"/>
+        <line x1="217" y1="50" x2="103" y2="270" stroke="rgba(0,212,255,0.04)" stroke-width="1" stroke-dasharray="3,4"/>
+
+        <!-- Labels -->
+        <text x="160" y="24" text-anchor="middle" fill="#f5d800" font-size="8.5" font-family="Orbitron,sans-serif" letter-spacing="1">AMARILLO</text>
+        <text x="238" y="47" text-anchor="middle" fill="#f5a000" font-size="8" font-family="Orbitron,sans-serif">AM-NA</text>
+        <text x="294" y="118" text-anchor="middle" fill="#f07000" font-size="8.5" font-family="Orbitron,sans-serif">NARANJA</text>
+        <text x="298" y="174" text-anchor="middle" fill="#d88060" font-size="8" font-family="Orbitron,sans-serif">NA-RO</text>
+        <text x="272" y="237" text-anchor="middle" fill="#ff8080" font-size="8.5" font-family="Orbitron,sans-serif">ROJO</text>
+        <text x="215" y="296" text-anchor="middle" fill="#e090e0" font-size="8" font-family="Orbitron,sans-serif">RO-VI</text>
+        <text x="140" y="308" text-anchor="middle" fill="#b080f0" font-size="8.5" font-family="Orbitron,sans-serif">VIOLETA</text>
+        <text x="67" y="296" text-anchor="middle" fill="#9090f0" font-size="8" font-family="Orbitron,sans-serif">VI-AZ</text>
+        <text x="18" y="174" text-anchor="middle" fill="#80b0ff" font-size="8.5" font-family="Orbitron,sans-serif">AZUL</text>
+        <text x="22" y="118" text-anchor="middle" fill="#60c0d0" font-size="8" font-family="Orbitron,sans-serif">AZ-VE</text>
+        <text x="48" y="47" text-anchor="middle" fill="#80d880" font-size="8.5" font-family="Orbitron,sans-serif">VERDE</text>
+        <text x="82" y="24" text-anchor="middle" fill="#b8e040" font-size="8" font-family="Orbitron,sans-serif">VE-AM</text>
+      </svg>
+    </div>
+
+    <!-- PANEL DERECHO -->
+    <div class="star-info-panel">
+      <div class="error-selector">
+        <label>¿Qué color no deseado apareció?</label>
+        <div class="color-buttons" id="colorButtons"></div>
       </div>
-    </div>
-    <div class="compat-wrap" id="compatWrap" style="display:none">
-      <div class="compat-label"><span>Compatibilidad con base</span><span id="compatPct">—</span></div>
-      <div class="compat-track"><div class="compat-fill" id="compatFill" style="width:0%"></div></div>
-    </div>
-    <div class="suggestion-box" id="suggBox">
-      <div class="sug-title">💡 Sugerencia del sistema</div>
-      <span id="suggText"></span>
-    </div>
-    <label>Tono base del cabello (actual)</label>
-    <select id="baseHair" onchange="onBaseChange()">
-      <option value="">— Seleccionar —</option>
-      <option value="1">1 — Negro</option>
-      <option value="2">2 — Castaño muy oscuro</option>
-      <option value="3">3 — Castaño oscuro</option>
-      <option value="4">4 — Castaño medio</option>
-      <option value="5">5 — Castaño claro</option>
-      <option value="6">6 — Rubio oscuro</option>
-      <option value="7">7 — Rubio medio</option>
-      <option value="8">8 — Rubio claro</option>
-      <option value="9">9 — Rubio muy claro</option>
-      <option value="10">10 — Rubio platino</option>
-    </select>
-    <label>Porcentaje de canas</label>
-    <select id="grays" onchange="onBaseChange()">
-      <option value="0">Sin canas</option>
-      <option value="25">25% — Pocas canas</option>
-      <option value="50">50% — Mitad canas</option>
-      <option value="75">75% — Mayoría canas</option>
-      <option value="100">100% — Totalmente blanco</option>
-    </select>
-    <button class="btn-calc" onclick="calculate()">✦ Calcular Fórmula</button>
-  </div>
-
-  <!-- PARAMS -->
-  <div class="card">
-    <div class="card-title"><span class="dot"></span> Parámetros de Aplicación</div>
-    <label>Técnica de aplicación</label>
-    <select id="technique">
-      <option value="full">Coloración completa</option>
-      <option value="roots">Solo raíces</option>
-      <option value="balayage">Balayage / Mechas</option>
-      <option value="gloss">Gloss / Baño de color</option>
-      <option value="toner">Toner (sobre decolorado)</option>
-      <option value="highlights">Highlights con papel</option>
-      <option value="ombre">Ombré / Degradé</option>
-    </select>
-    <label>Línea de tinte preferida</label>
-    <select id="brand">
-      <option value="generic">Genérica / Universal</option>
-      <option value="wella">Wella Koleston Perfect</option>
-      <option value="loreal">L'Oréal Majirel</option>
-      <option value="igora">Schwarzkopf Igora Royal</option>
-      <option value="redken">Redken Chromatics</option>
-      <option value="matrix">Matrix SoColor</option>
-      <option value="keune">Keune Tinta</option>
-    </select>
-    <label>Tiempo de exposición</label>
-    <select id="time">
-      <option value="35">35 min — Estándar con calor</option>
-      <option value="45">45 min — Mayor cobertura canas</option>
-      <option value="30">30 min — Estándar sin calor</option>
-      <option value="20">20 min — Semipermanente</option>
-      <option value="10">10 min — Toner expreso</option>
-    </select>
-    <label>Tipo de cabello</label>
-    <select id="hairType">
-      <option value="normal">Normal</option>
-      <option value="poroso">Poroso / Dañado</option>
-      <option value="resistente">Resistente / Grueso</option>
-      <option value="fino">Fino / Delicado</option>
-      <option value="rizado">Rizado / Afro</option>
-    </select>
-  </div>
-
-  <!-- RESULTADO -->
-  <div class="card result-card" id="resultCard">
-    <div class="card-title"><span class="dot"></span> Fórmula Calculada <span class="tag">Resultado</span></div>
-    <div class="result-header">
-      <div class="result-swatch-large" id="resColor"></div>
-      <div class="result-header-info">
-        <h2 id="resName">—</h2>
-        <p id="resDesc">—</p>
+      <div class="neutralizer-result" id="neutResult">
+        <div class="neut-placeholder" id="neutPlaceholder">Selecciona un color de error<br>para obtener el neutralizador<br>y la fórmula de corrección</div>
       </div>
-    </div>
-    <div class="formula-title">📐 Composición de la Mezcla</div>
-    <div class="formula-rows" id="formulaRows"></div>
-    <div class="oxid-info">
-      <div class="oxid-icon">⚗️</div>
-      <div class="oxid-text">
-        <h4 id="oxidTitle">Oxidante recomendado</h4>
-        <p id="oxidDesc">—</p>
-      </div>
-    </div>
-    <div class="amounts-grid" id="amountsGrid"></div>
-    <div class="pro-panel">
-      <div class="pro-panel-title">✦ Datos Profesionales</div>
-      <div class="pro-grid" id="proGrid"></div>
-    </div>
-    <div class="sep"></div>
-    <div class="tip-box" id="tipBox">—</div>
-  </div>
-
-  <!-- EMPTY -->
-  <div class="card result-card visible" id="emptyCard" style="grid-column:1/-1;">
-    <div class="empty-state">
-      <div class="icon">✦</div>
-      <p>Selecciona un tono en la paleta, configura los datos del cliente<br>y presiona <strong style="color:var(--gold)">Calcular Fórmula</strong></p>
-    </div>
-  </div>
-
-  <!-- ═══════════ ESTRELLA DE COLOR ═══════════ -->
-  <div class="card star-section">
-    <div class="card-title"><span class="dot"></span> Estrella de Color — Neutralización de Errores</div>
-    <p style="font-size:0.82rem;color:var(--muted);margin-bottom:1.4rem;line-height:1.6;">
-      La estrella de color muestra los colores opuestos (complementarios). Selecciona el color no deseado que apareció en el cabello y obtendrás el neutralizador exacto y la fórmula de corrección.
-    </p>
-    <div class="color-star-wrap">
-
-      <!-- SVG ESTRELLA -->
-      <div class="star-svg-container">
-        <svg viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" id="colorStarSvg">
-          <defs>
-            <filter id="glow"><feGaussianBlur stdDeviation="3" result="coloredBlur"/><feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-          </defs>
-
-          <!-- Centro -->
-          <circle cx="160" cy="160" r="28" fill="#1a1520" stroke="rgba(255,255,255,0.15)" stroke-width="1.5"/>
-          <text x="160" y="155" text-anchor="middle" fill="var(--gold)" font-size="11" font-family="Cormorant Garamond,serif" font-style="italic">Star</text>
-          <text x="160" y="168" text-anchor="middle" fill="var(--gold-light)" font-size="10" font-family="Cormorant Garamond,serif">Shine</text>
-
-          <!-- 12 segmentos de la estrella (como reloj de colores) -->
-          <!-- Amarillo -->
-          <path class="star-seg" id="seg-amarillo" data-color="amarillo"
-            d="M160,160 L160,40 A120,120 0 0,1 220,55 Z"
-            fill="#f5d800" opacity="0.88"/>
-          <!-- Amarillo-Naranja -->
-          <path class="star-seg" id="seg-amarillo-naranja" data-color="amarillo-naranja"
-            d="M160,160 L220,55 A120,120 0 0,1 270,110 Z"
-            fill="#f5a000" opacity="0.88"/>
-          <!-- Naranja -->
-          <path class="star-seg" id="seg-naranja" data-color="naranja"
-            d="M160,160 L270,110 A120,120 0 0,1 280,160 Z"
-            fill="#f07000" opacity="0.88"/>
-          <!-- Naranja-Rojo -->
-          <path class="star-seg" id="seg-naranja-rojo" data-color="naranja-rojo"
-            d="M160,160 L280,160 A120,120 0 0,1 270,210 Z"
-            fill="#d83000" opacity="0.88"/>
-          <!-- Rojo -->
-          <path class="star-seg" id="seg-rojo" data-color="rojo"
-            d="M160,160 L270,210 A120,120 0 0,1 220,265 Z"
-            fill="#c01818" opacity="0.88"/>
-          <!-- Rojo-Violeta -->
-          <path class="star-seg" id="seg-rojo-violeta" data-color="rojo-violeta"
-            d="M160,160 L220,265 A120,120 0 0,1 160,280 Z"
-            fill="#9010a0" opacity="0.88"/>
-          <!-- Violeta -->
-          <path class="star-seg" id="seg-violeta" data-color="violeta"
-            d="M160,160 L160,280 A120,120 0 0,1 100,265 Z"
-            fill="#6010c8" opacity="0.88"/>
-          <!-- Violeta-Azul -->
-          <path class="star-seg" id="seg-violeta-azul" data-color="violeta-azul"
-            d="M160,160 L100,265 A120,120 0 0,1 50,210 Z"
-            fill="#2838c8" opacity="0.88"/>
-          <!-- Azul -->
-          <path class="star-seg" id="seg-azul" data-color="azul"
-            d="M160,160 L50,210 A120,120 0 0,1 40,160 Z"
-            fill="#1850e0" opacity="0.88"/>
-          <!-- Azul-Verde -->
-          <path class="star-seg" id="seg-azul-verde" data-color="azul-verde"
-            d="M160,160 L40,160 A120,120 0 0,1 50,110 Z"
-            fill="#0090a0" opacity="0.88"/>
-          <!-- Verde -->
-          <path class="star-seg" id="seg-verde" data-color="verde"
-            d="M160,160 L50,110 A120,120 0 0,1 100,55 Z"
-            fill="#20a030" opacity="0.88"/>
-          <!-- Verde-Amarillo -->
-          <path class="star-seg" id="seg-verde-amarillo" data-color="verde-amarillo"
-            d="M160,160 L100,55 A120,120 0 0,1 160,40 Z"
-            fill="#90c000" opacity="0.88"/>
-
-          <!-- Etiquetas -->
-          <text x="160" y="22" text-anchor="middle" fill="#f5d800" font-size="9.5" font-family="DM Sans,sans-serif">Amarillo</text>
-          <text x="237" y="48" text-anchor="middle" fill="#f5a000" font-size="9" font-family="DM Sans,sans-serif">Am-Na</text>
-          <text x="292" y="118" text-anchor="middle" fill="#f07000" font-size="9.5" font-family="DM Sans,sans-serif">Naranja</text>
-          <text x="300" y="175" text-anchor="middle" fill="#d83000" font-size="9" font-family="DM Sans,sans-serif">Na-Ro</text>
-          <text x="272" y="235" text-anchor="middle" fill="#ff8080" font-size="9.5" font-family="DM Sans,sans-serif">Rojo</text>
-          <text x="212" y="295" text-anchor="middle" fill="#e090e0" font-size="9" font-family="DM Sans,sans-serif">Ro-Vi</text>
-          <text x="140" y="306" text-anchor="middle" fill="#b080f0" font-size="9.5" font-family="DM Sans,sans-serif">Violeta</text>
-          <text x="68" y="295" text-anchor="middle" fill="#9090f0" font-size="9" font-family="DM Sans,sans-serif">Vi-Az</text>
-          <text x="16" y="175" text-anchor="middle" fill="#80b0ff" font-size="9.5" font-family="DM Sans,sans-serif">Azul</text>
-          <text x="20" y="118" text-anchor="middle" fill="#60c0d0" font-size="9" font-family="DM Sans,sans-serif">Az-Ve</text>
-          <text x="48" y="48" text-anchor="middle" fill="#80d880" font-size="9.5" font-family="DM Sans,sans-serif">Verde</text>
-          <text x="83" y="22" text-anchor="middle" fill="#b8e040" font-size="9" font-family="DM Sans,sans-serif">Ve-Am</text>
-
-          <!-- Líneas de oposición (punteadas) -->
-          <line x1="160" y1="44" x2="160" y2="276" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="44" y1="160" x2="276" y2="160" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="75" y1="75" x2="245" y2="245" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="245" y1="75" x2="75" y2="245" stroke="rgba(255,255,255,0.08)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="100" y1="50" x2="220" y2="270" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,3"/>
-          <line x1="220" y1="50" x2="100" y2="270" stroke="rgba(255,255,255,0.05)" stroke-width="1" stroke-dasharray="4,3"/>
-        </svg>
-      </div>
-
-      <!-- PANEL DERECHO -->
-      <div class="star-info-panel">
-        <div class="error-selector">
-          <label>¿Qué color no deseado apareció?</label>
-          <div class="color-buttons" id="colorButtons"></div>
-        </div>
-
-        <div class="neutralizer-result" id="neutResult">
-          <div class="neut-placeholder" id="neutPlaceholder">
-            Haz clic en un segmento de la estrella<br>o selecciona un color de error arriba<br>para obtener el neutralizador y la fórmula de corrección.
-          </div>
-        </div>
-
-        <div class="star-legend">
-          <div class="legend-item"><div class="legend-dot" style="background:#c01818"></div>Error común en rubios oscuros</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#f07000"></div>Error en decoloración</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#f5d800"></div>Error en platinos</div>
-          <div class="legend-item"><div class="legend-dot" style="background:#6010c8"></div>Neutralizador frío</div>
-        </div>
+      <div class="star-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#c01818"></div>Error en rubios oscuros</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f07000"></div>Error en decoloración</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f5d800"></div>Error en platinos</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#6010c8"></div>Neutralizador frío</div>
       </div>
     </div>
   </div>
+</div>
 
 </div><!-- /main-grid -->
-<footer>Star Shine · Calculadora Profesional de Colorimetría Capilar · © 2026</footer>
+
+<footer>
+  <div class="saber-line"></div>
+  Star Shine · Calculadora Profesional de Colorimetría Capilar · 2026
+  <div class="saber-line"></div>
+</footer>
 </div><!-- /container -->
 
 <script>
-// ============================================================
-// PALETA
-// ============================================================
+// ── STARFIELD ──
+(function(){
+  const sf=document.getElementById('starfield');
+  const colors=['#ffffff','#00d4ff','#f5c842','#8844ff','#aaddff'];
+  for(let i=0;i<180;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2.5+0.5;
+    const col=colors[Math.floor(Math.random()*colors.length)];
+    const delay=-(Math.random()*6);
+    const dur=2+Math.random()*5;
+    s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;background:${col};--d:${dur}s;--delay:${delay}s;opacity:0.2;`;
+    sf.appendChild(s);
+  }
+})();
+
+// ── PALETA ──
 const palette = {
   "Naturales & Castaños":{badge:null,colors:[
     {id:"1.0",name:"Negro Natural",code:"1/0",hex:"#1a1008",ox:[6,9],mod:["neutro"]},
@@ -447,7 +528,7 @@ const palette = {
     {id:"5.0",name:"Castaño claro",code:"5/0",hex:"#8b4513",ox:[20,30],mod:["dorado","cobrizo"]},
     {id:"5.3",name:"Castaño dorado claro",code:"5/3",hex:"#9b5523",ox:[20,30],mod:["dorado"]},
   ]},
-  "Tendencias 2025 🔥":{badge:"trending",colors:[
+  "Tendencias 2025":{badge:"trending",colors:[
     {id:"T25.MC",name:"Marrón Chocolate",code:"4/77",hex:"#4a1f0e",ox:[20],mod:["caoba","neutro"],trend:true},
     {id:"T25.MD",name:"Miel Dorado",code:"7/34",hex:"#c8882a",ox:[20,30],mod:["dorado","cobrizo"],trend:true},
     {id:"T25.MB",name:"Rubio Mantequilla",code:"9/32",hex:"#e4c870",ox:[30,40],mod:["dorado","ceniza"],trend:true},
@@ -474,7 +555,7 @@ const palette = {
     {id:"10.0",name:"Rubio platino",code:"10/0",hex:"#f0dfa8",ox:[40],mod:["platino","violeta"]},
     {id:"10.1",name:"Rubio platino frío",code:"10/1",hex:"#e8e0cc",ox:[40],mod:["violeta","azul"]},
   ]},
-  "Rojos, Cobrizos & Vibrantes":{badge:null,colors:[
+  "Rojos & Cobrizos":{badge:null,colors:[
     {id:"5.4",name:"Castaño cobrizo",code:"5/4",hex:"#9b3a1a",ox:[20,30],mod:["cobrizo","rojo"]},
     {id:"6.4",name:"Rubio oscuro cobrizo",code:"6/4",hex:"#c04010",ox:[20,30],mod:["cobrizo"]},
     {id:"6.6",name:"Rojo intenso",code:"6/6",hex:"#b02020",ox:[20,30],mod:["rojo"]},
@@ -520,235 +601,137 @@ const palette = {
   ]},
 };
 
-const mods = {
-  neutro: {name:"Neutro 0/0",hex:"#d0c8b8",desc:"Aporta cobertura sin alterar tono"},
-  dorado: {name:"Dorado 0/3",hex:"#d4a83c",desc:"Calienta y aporta luminosidad"},
-  cobrizo:{name:"Cobrizo 0/4",hex:"#c8601a",desc:"Intensifica los reflejos cobrizos"},
-  ceniza: {name:"Ceniza 0/1",hex:"#a0a8a0",desc:"Neutraliza amarillos, aporta frío"},
-  rojo:   {name:"Rojo 0/6",hex:"#c02828",desc:"Potencia rojos y cobres"},
+const mods={
+  neutro:{name:"Neutro 0/0",hex:"#d0c8b8",desc:"Cobertura sin alterar tono"},
+  dorado:{name:"Dorado 0/3",hex:"#d4a83c",desc:"Calienta y aporta luminosidad"},
+  cobrizo:{name:"Cobrizo 0/4",hex:"#c8601a",desc:"Intensifica reflejos cobrizos"},
+  ceniza:{name:"Ceniza 0/1",hex:"#a0a8a0",desc:"Neutraliza amarillos, aporta frío"},
+  rojo:{name:"Rojo 0/6",hex:"#c02828",desc:"Potencia rojos y cobres"},
   violeta:{name:"Violeta 0/2",hex:"#9060b0",desc:"Neutraliza amarillos, aporta frío"},
-  caoba:  {name:"Caoba 0/5",hex:"#7a2040",desc:"Profundiza rojos oscuros"},
+  caoba:{name:"Caoba 0/5",hex:"#7a2040",desc:"Profundiza rojos oscuros"},
   platino:{name:"Platino 0/11",hex:"#d8d4cc",desc:"Máxima neutralización amarilla"},
-  azul:   {name:"Corrector azul",hex:"#4868a0",desc:"Contrarresta naranja residual"},
-  rosa:   {name:"Rosa 0/65",hex:"#e090a0",desc:"Aporta reflejos rosados"},
-  verde:  {name:"Verde corrector",hex:"#508050",desc:"Neutraliza rojos indeseados"},
+  azul:{name:"Corrector azul",hex:"#4868a0",desc:"Contrarresta naranja residual"},
+  rosa:{name:"Rosa 0/65",hex:"#e090a0",desc:"Aporta reflejos rosados"},
+  verde:{name:"Verde corrector",hex:"#508050",desc:"Neutraliza rojos indeseados"},
 };
 
-const oxidantes = {
-  6:{name:"Oxigenada 6 vol. (1,8%)",use:"Toners, depósito de color, canas <25%"},
-  9:{name:"Oxigenada 9 vol. (2,7%)",use:"Coloración igual tono, cobertura de canas"},
-  20:{name:"Oxigenada 20 vol. (6%)",use:"1–2 tonos aclarado, cobertura total de canas"},
-  30:{name:"Oxigenada 30 vol. (9%)",use:"3–4 tonos aclarado, máxima luminosidad"},
-  40:{name:"Oxigenada 40 vol. (12%)",use:"4–5 tonos aclarado (solo rubios naturales)"},
+const oxidantes={
+  6:{name:"Oxigenada 6 vol. (1,8%)",use:"Toners, depósito, canas <25%"},
+  9:{name:"Oxigenada 9 vol. (2,7%)",use:"Mismo tono, cobertura de canas"},
+  20:{name:"Oxigenada 20 vol. (6%)",use:"1–2 tonos aclarado, canas totales"},
+  30:{name:"Oxigenada 30 vol. (9%)",use:"3–4 tonos aclarado, máx luminosidad"},
+  40:{name:"Oxigenada 40 vol. (12%)",use:"4–5 tonos (solo rubios naturales)"},
 };
 
-const techTips = {
-  full:"Aplica de medios a puntas primero, luego raíces los últimos <strong>5–10 min</strong>. Las raíces procesan más rápido por el calor del cuero cabelludo.",
-  roots:"Aplica solo en zona de raíz (máx. 2 cm). Evita el solapamiento sobre el largo ya teñido para prevenir bandas de color oscuro.",
-  balayage:"Usa papel aluminio o film. Satura bien cada mechón. La degradación natural se logra difuminando el inicio con peine de cola.",
-  gloss:"Mezcla 1:2 (tinte:oxigenada). Aplica en cabello húmedo para mayor uniformidad y resultados más suaves y brillantes.",
-  toner:"Aplica siempre sobre cabello <strong>decolorado y seco</strong>. Verifica el nivel de decoloración antes de elegir el toner.",
-  highlights:"Secciona en capas horizontales. Aplica desde la raíz 0,5 cm hasta las puntas. El papel aluminio concentra calor y acelera el proceso.",
-  ombre:"Comienza la aplicación en el punto de transición deseado. Difumina con peine o esponja hacia abajo.",
+const techTips={
+  full:"Aplica de medios a puntas primero, raíces los últimos <strong>5–10 min</strong>. Las raíces procesan más rápido por el calor del cuero cabelludo.",
+  roots:"Aplica solo en zona de raíz (máx. 2 cm). Evita solapamiento sobre el largo para prevenir bandas oscuras.",
+  balayage:"Usa papel aluminio o film. Satura cada mechón. Difumina el inicio con peine de cola para degradación natural.",
+  gloss:"Mezcla 1:2 (tinte:oxigenada). Aplica en cabello húmedo para resultados más suaves y brillantes.",
+  toner:"Aplica sobre cabello <strong>decolorado y seco</strong>. Verifica el nivel de decoloración antes de elegir el toner.",
+  highlights:"Secciona en capas horizontales. Aplica desde la raíz hasta puntas. El papel concentra calor y acelera el proceso.",
+  ombre:"Comienza en el punto de transición. Difumina con peine o esponja hacia abajo.",
 };
 
-const hairTypeTips = {
+const hairTypeTips={
   normal:"",
-  poroso:"⚠️ <strong>Cabello poroso:</strong> Reduce el tiempo un 10–15% para evitar sobre-saturación. Considera un tratamiento de proteínas previo.",
-  resistente:"⚠️ <strong>Cabello resistente:</strong> Añade 5–10 min extra. Considera aumentar el volumen de oxidante un nivel.",
-  fino:"⚠️ <strong>Cabello fino:</strong> Usa oxidante de menor volumen. El gloss es ideal para este tipo de cabello.",
-  rizado:"⚠️ <strong>Cabello rizado:</strong> Aplica en secciones pequeñas para saturación uniforme. Usa más producto del estimado.",
+  poroso:"⚡ <strong>Cabello poroso:</strong> Reduce el tiempo un 10–15%. Considera tratamiento de proteínas previo.",
+  resistente:"⚡ <strong>Cabello resistente:</strong> Añade 5–10 min extra. Considera aumentar el oxidante un nivel.",
+  fino:"⚡ <strong>Cabello fino:</strong> Usa oxidante de menor volumen. El gloss es ideal para este tipo.",
+  rizado:"⚡ <strong>Cabello rizado:</strong> Aplica en secciones pequeñas para saturación uniforme.",
 };
 
-// ============================================================
-// ESTRELLA DE COLOR — Datos de neutralización
-// ============================================================
-const starData = {
-  "amarillo":{
-    label:"Amarillo",hex:"#f5d800",
-    neutralizer:"Violeta",neutHex:"#7030c0",neutCode:"0/2 o 0/22",
-    where:"Aparece en rubios decolorados con mal lifting, platinos y canas teñidas.",
-    formula:"Añade <strong>10–20%</strong> de tinte violeta (0/2) al tono deseado. En toners: usa T/V o shampoo violeta. Para caso severo: toner 0/22 puro con 6 vol.",
-    commonIn:["Platino","Rubio muy claro","Gris perla"],
-  },
-  "amarillo-naranja":{
-    label:"Amarillo-Naranja",hex:"#f5a000",
-    neutralizer:"Azul-Violeta",neutHex:"#3040c0",neutCode:"0/12 o 0/21",
-    where:"Aparece en decoloraciones intermedias (nivel 7–8) y rubios con calidez residual.",
-    formula:"Mezcla <strong>15–25%</strong> de corrector azul-violeta. Alternativamente usa un toner ceniza fría o 7/11 para equilibrar.",
-    commonIn:["Rubio claro","Rubio dorado","Decoloración incompleta"],
-  },
-  "naranja":{
-    label:"Naranja",hex:"#f07000",
-    neutralizer:"Azul",neutHex:"#1850e0",neutCode:"0/11 o corrector azul",
-    where:"Error más común en decoloración de cabellos oscuros. Subtono natural de los castaños.",
-    formula:"Aplica <strong>corrector azul</strong> al 10–20% sobre el tinte deseado. Para corrección directa: toner azul ceniza con 9 vol. durante 20 min.",
-    commonIn:["Castaño oscuro","Decoloración nivel 5–6","Rubio oscuro"],
-  },
-  "naranja-rojo":{
-    label:"Naranja-Rojo",hex:"#d83000",
-    neutralizer:"Azul-Verde",neutHex:"#0090a0",neutCode:"0/11 + 0/13",
-    where:"Aparece en cabellos oscuros decolorados a nivel 5. Combinación difícil de neutralizar.",
-    formula:"Usa <strong>corrector azul + toque de verde</strong> (proporción 3:1). Aplica toner con base azul-ceniza fría. Puede requerir dos sesiones.",
-    commonIn:["Castaño oscuro","Negro decolorado","Brunettes con lifting"],
-  },
-  "rojo":{
-    label:"Rojo",hex:"#c01818",
-    neutralizer:"Verde",neutHex:"#20a030",neutCode:"0/13 o base verde",
-    where:"Aparece en correcciones de rojo-caoba mal removido o en cabellos con pigmentación roja artificial.",
-    formula:"Añade <strong>10–15%</strong> de base verde (corrector 0/13) al tono neutro. No exceder para evitar tono ceniza verdoso. Actuar durante 30 min.",
-    commonIn:["Post rojo intenso","Caoba residual","Corrección de fantasía"],
-  },
-  "rojo-violeta":{
-    label:"Rojo-Violeta",hex:"#9010a0",
-    neutralizer:"Verde-Amarillo",neutHex:"#90c000",neutCode:"0/3 + 0/13",
-    where:"Subtono de correcciones de caoba o tintes violetas mal aclarados.",
-    formula:"Mezcla <strong>dorado 0/3 con toque de verde</strong> en proporción 2:1. Aplicar sobre cabello seco con oxidante 9 vol. durante 20 min.",
-    commonIn:["Post violeta","Caoba desvanecido","Corrección de fantasía"],
-  },
-  "violeta":{
-    label:"Violeta",hex:"#6010c8",
-    neutralizer:"Amarillo",neutHex:"#f5d800",neutCode:"0/3 intenso",
-    where:"Aparece en correcciones donde se abusó del violeta o toners azulados. Da apariencia grisácea-morada.",
-    formula:"Aplica <strong>tonos cálidos dorados 0/3</strong> al 20–30% sobre neutro. Un baño de color tibio cobre eliminará el violeta residual rápidamente.",
-    commonIn:["Post toner violeta","Shampoo violeta en exceso","Rubio platino grisáceo"],
-  },
-  "violeta-azul":{
-    label:"Violeta-Azul",hex:"#2838c8",
-    neutralizer:"Naranja-Amarillo",neutHex:"#f5a000",neutCode:"0/3 + 0/4",
-    where:"Resultado de toners azul-violeta aplicados en exceso o sobre cabello muy poroso.",
-    formula:"Usa <strong>base cálida dorada-cobriza</strong> (0/3 + 0/4 en 2:1) con oxidante 9 vol. El calor suave del secador intensifica la corrección.",
-    commonIn:["Post toner azul","Rubio con exceso de shampoo violeta","Gris azulado"],
-  },
-  "azul":{
-    label:"Azul",hex:"#1850e0",
-    neutralizer:"Naranja",neutHex:"#f07000",neutCode:"0/4 cobrizo",
-    where:"Aparece tras coloraciones de fantasía azul o toners en exceso sobre cabello muy poroso.",
-    formula:"Aplica <strong>corrector cobrizo 0/4</strong> al 15–20% puro o mezclado con base neutra. El cobrizo dorado neutraliza el azul de forma directa.",
-    commonIn:["Post fantasía azul","Toners en exceso","Coloración directa azul desvanecida"],
-  },
-  "azul-verde":{
-    label:"Azul-Verde",hex:"#0090a0",
-    neutralizer:"Naranja-Rojo",neutHex:"#d83000",neutCode:"0/4 + 0/6",
-    where:"Resultado de pigmentos fríos de fantasía desvanecidos o reflexiones en canas mal cubiertas.",
-    formula:"Mezcla <strong>cobrizo + rojo</strong> (0/4 + 0/6 en 2:1). Actúa sobre cabello limpio y seco con 20 vol. durante 25–30 min.",
-    commonIn:["Post fantasía verde","Canas con reflejos fríos","Coloración directa verde"],
-  },
-  "verde":{
-    label:"Verde",hex:"#20a030",
-    neutralizer:"Rojo",neutHex:"#c01818",neutCode:"0/6 o 0/66",
-    where:"Error clásico en piscinas (cloro) y en correcciones de fantasía verde sobre rubio.",
-    formula:"Aplica <strong>corrector rojo 0/6</strong> al 15% sobre tono deseado. Para verde de cloro: mascarilla de tomate o corrector rojo intenso 0/66 diluido.",
-    commonIn:["Piscina / cloro","Post fantasía verde","Reflexiones verdes en rubio ceniza"],
-  },
-  "verde-amarillo":{
-    label:"Verde-Amarillo",hex:"#90c000",
-    neutralizer:"Violeta-Rojo",neutHex:"#9010a0",neutCode:"0/2 + 0/5",
-    where:"Tono raro que aparece en cabellos muy porosos con base ceniza sobre amarillo residual.",
-    formula:"Combina <strong>violeta + caoba</strong> (0/2 + 0/5 en 3:1). Actúa rápidamente pues el exceso vira a rojo. Tiempo máximo: 20 min.",
-    commonIn:["Rubio ceniza sobre amarillo","Base muy porosa","Error en cenizas fuertes"],
-  },
+const starData={
+  "amarillo":{label:"Amarillo",hex:"#f5d800",neutralizer:"Violeta",neutHex:"#7030c0",neutCode:"0/2 o 0/22",where:"Rubios decolorados con mal lifting, platinos y canas teñidas.",formula:"Añade <strong>10–20%</strong> de tinte violeta (0/2) al tono deseado. Para toners: usa T/V o shampoo violeta. Caso severo: toner 0/22 puro con 6 vol.",commonIn:["Platino","Rubio muy claro","Gris perla"]},
+  "amarillo-naranja":{label:"Am-Naranja",hex:"#f5a000",neutralizer:"Azul-Violeta",neutHex:"#3040c0",neutCode:"0/12 o 0/21",where:"Decoloraciones intermedias nivel 7–8 y rubios con calidez residual.",formula:"Mezcla <strong>15–25%</strong> corrector azul-violeta. Alternativa: toner ceniza fría o 7/11 para equilibrar.",commonIn:["Rubio claro","Rubio dorado","Decoloración incompleta"]},
+  "naranja":{label:"Naranja",hex:"#f07000",neutralizer:"Azul",neutHex:"#1850e0",neutCode:"0/11 o corrector azul",where:"Error más común en decoloración de cabellos oscuros. Subtono natural de castaños.",formula:"Aplica <strong>corrector azul</strong> al 10–20% sobre el tinte deseado. Corrección directa: toner azul ceniza con 9 vol. 20 min.",commonIn:["Castaño oscuro","Decoloración nivel 5–6","Rubio oscuro"]},
+  "naranja-rojo":{label:"Na-Rojo",hex:"#d83000",neutralizer:"Azul-Verde",neutHex:"#0090a0",neutCode:"0/11 + 0/13",where:"Cabellos oscuros decolorados a nivel 5. Difícil de neutralizar.",formula:"Usa <strong>azul + toque de verde</strong> (3:1). Toner base azul-ceniza fría. Puede requerir dos sesiones.",commonIn:["Castaño oscuro","Negro decolorado","Brunettes con lifting"]},
+  "rojo":{label:"Rojo",hex:"#c01818",neutralizer:"Verde",neutHex:"#20a030",neutCode:"0/13 o base verde",where:"Correcciones de rojo-caoba mal removido o pigmentación roja artificial.",formula:"Añade <strong>10–15%</strong> de base verde (0/13) al tono neutro. No exceder para evitar tono verdoso. 30 min.",commonIn:["Post rojo intenso","Caoba residual","Corrección de fantasía"]},
+  "rojo-violeta":{label:"Ro-Violeta",hex:"#9010a0",neutralizer:"Verde-Amarillo",neutHex:"#90c000",neutCode:"0/3 + 0/13",where:"Subtonos de correcciones de caoba o tintes violetas mal aclarados.",formula:"Mezcla <strong>dorado 0/3 + verde</strong> en proporción 2:1. Con oxidante 9 vol. 20 min.",commonIn:["Post violeta","Caoba desvanecido","Corrección de fantasía"]},
+  "violeta":{label:"Violeta",hex:"#6010c8",neutralizer:"Amarillo",neutHex:"#f5d800",neutCode:"0/3 intenso",where:"Exceso de violeta o toners azulados. Apariencia grisácea-morada.",formula:"Aplica <strong>tonos cálidos dorados 0/3</strong> al 20–30% sobre neutro. Baño de color cobre elimina violeta rápidamente.",commonIn:["Post toner violeta","Shampoo violeta exceso","Rubio platino grisáceo"]},
+  "violeta-azul":{label:"Vi-Azul",hex:"#2838c8",neutralizer:"Naranja-Amarillo",neutHex:"#f5a000",neutCode:"0/3 + 0/4",where:"Toners azul-violeta en exceso o sobre cabello muy poroso.",formula:"Usa <strong>base cálida dorada-cobriza</strong> (0/3 + 0/4 en 2:1) con 9 vol. El calor intensifica la corrección.",commonIn:["Post toner azul","Rubio con exceso shampoo violeta","Gris azulado"]},
+  "azul":{label:"Azul",hex:"#1850e0",neutralizer:"Naranja",neutHex:"#f07000",neutCode:"0/4 cobrizo",where:"Coloraciones de fantasía azul o toners en exceso sobre cabello poroso.",formula:"Aplica <strong>corrector cobrizo 0/4</strong> al 15–20%. El cobrizo dorado neutraliza el azul directamente.",commonIn:["Post fantasía azul","Toners en exceso","Coloración directa azul desvanecida"]},
+  "azul-verde":{label:"Az-Verde",hex:"#0090a0",neutralizer:"Naranja-Rojo",neutHex:"#d83000",neutCode:"0/4 + 0/6",where:"Pigmentos fríos de fantasía desvanecidos o reflexiones en canas.",formula:"Mezcla <strong>cobrizo + rojo</strong> (0/4 + 0/6 en 2:1). Cabello seco con 20 vol. 25–30 min.",commonIn:["Post fantasía verde","Canas con reflejos fríos","Coloración directa verde"]},
+  "verde":{label:"Verde",hex:"#20a030",neutralizer:"Rojo",neutHex:"#c01818",neutCode:"0/6 o 0/66",where:"Piscinas (cloro) y correcciones de fantasía verde sobre rubio.",formula:"Aplica <strong>corrector rojo 0/6</strong> al 15%. Verde de cloro: mascarilla de tomate o 0/66 diluido.",commonIn:["Piscina / cloro","Post fantasía verde","Reflexiones verdes en rubio ceniza"]},
+  "verde-amarillo":{label:"Ve-Amarillo",hex:"#90c000",neutralizer:"Violeta-Rojo",neutHex:"#9010a0",neutCode:"0/2 + 0/5",where:"Cabellos muy porosos con base ceniza sobre amarillo residual.",formula:"Combina <strong>violeta + caoba</strong> (0/2 + 0/5 en 3:1). Máx. 20 min para evitar viro a rojo.",commonIn:["Rubio ceniza sobre amarillo","Base muy porosa","Error en cenizas fuertes"]},
 };
 
-// ============================================================
-// RENDER PALETA
-// ============================================================
-let selectedColor = null;
-
-function renderPalette() {
-  const container = document.getElementById('paletteGroups');
-  container.innerHTML = '';
-  for (const [group, data] of Object.entries(palette)) {
-    const wrap = document.createElement('div');
-    let badgeHTML = '';
-    if (data.badge === 'trending') badgeHTML = '<span class="group-badge trending">🔥 Tendencia</span>';
-    if (data.badge === 'new2025')  badgeHTML = '<span class="group-badge new2025">✦ Nuevos</span>';
-    wrap.innerHTML = `<div class="palette-group-header"><div class="palette-group-label">${group}</div>${badgeHTML}</div><div class="swatches"></div>`;
+// ── RENDER PALETTE ──
+let selectedColor=null;
+function renderPalette(){
+  const container=document.getElementById('paletteGroups');
+  container.innerHTML='';
+  for(const[group,data]of Object.entries(palette)){
+    const wrap=document.createElement('div');
+    let badge='';
+    if(data.badge==='trending') badge='<span class="group-badge trending">⚡ Tendencia</span>';
+    if(data.badge==='new2025')  badge='<span class="group-badge new2025">✦ Nuevos</span>';
+    wrap.innerHTML=`<div class="palette-group-header"><div class="palette-group-label">${group}</div>${badge}</div><div class="swatches"></div>`;
     container.appendChild(wrap);
-    const sw = wrap.querySelector('.swatches');
-    data.colors.forEach(c => {
-      const el = document.createElement('div');
-      el.className = 'swatch';
-      el.style.background = c.hex;
-      el.dataset.tip = `${c.name} · ${c.code}`;
-      el.dataset.id = c.id;
-      if (c.trend) el.style.boxShadow = '0 0 0 2px rgba(200,80,80,0.5)';
-      el.addEventListener('click', () => selectColor(c, el));
+    const sw=wrap.querySelector('.swatches');
+    data.colors.forEach(c=>{
+      const el=document.createElement('div');
+      el.className='swatch';
+      el.style.background=c.hex;
+      el.dataset.tip=`${c.name} · ${c.code}`;
+      if(c.trend) el.style.boxShadow='0 0 0 2px rgba(255,100,100,0.6)';
+      el.addEventListener('click',()=>selectColor(c,el));
       sw.appendChild(el);
     });
   }
 }
 
-function selectColor(c, el) {
-  document.querySelectorAll('.swatch').forEach(s => s.classList.remove('selected'));
+function selectColor(c,el){
+  document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('selected'));
   el.classList.add('selected');
-  selectedColor = c;
-  document.getElementById('selPreview').style.background = c.hex;
-  document.getElementById('selName').textContent = c.name;
-  document.getElementById('selDesc').textContent = `Código: ${c.code}`;
-  const tagsEl = document.getElementById('selTags');
-  tagsEl.innerHTML = '';
-  c.mod.forEach(m => {
-    const t = document.createElement('span'); t.className = 'tone-tag';
-    t.textContent = m.charAt(0).toUpperCase() + m.slice(1); tagsEl.appendChild(t);
-  });
-  if (c.trend) {
-    const t = document.createElement('span'); t.className = 'tone-tag';
-    t.style.color='#e88080'; t.style.borderColor='rgba(200,80,80,0.3)'; t.textContent='🔥 Trending'; tagsEl.appendChild(t);
-  }
+  selectedColor=c;
+  document.getElementById('selPreview').style.background=c.hex;
+  document.getElementById('selName').textContent=c.name;
+  document.getElementById('selDesc').textContent=`Código: ${c.code}`;
+  const tagsEl=document.getElementById('selTags');
+  tagsEl.innerHTML='';
+  c.mod.forEach(m=>{const t=document.createElement('span');t.className='tone-tag';t.textContent=m.toUpperCase();tagsEl.appendChild(t);});
+  if(c.trend){const t=document.createElement('span');t.className='tone-tag';t.style.color='#ff9090';t.style.borderColor='rgba(255,80,80,0.4)';t.textContent='⚡ TRENDING';tagsEl.appendChild(t);}
   onBaseChange();
 }
 
-function getSuggestion(color, base, grays) {
-  if (!color || !base) return null;
-  const tl = parseFloat(color.id.split('.')[0]) || 5;
-  const b  = parseInt(base) || 0;
-  const diff = tl - b;
-  const g = parseInt(grays)||0;
-  if (color.id.startsWith('F.')||color.id.startsWith('G.')) return "Este tono requiere decoloración previa para mejores resultados. Asegura nivel 9–10 antes de aplicar.";
-  if (color.id.startsWith('T.')) return "Los toners trabajan mejor sobre nivel 9–10 de decoloración. Verifica que no haya subtonos amarillos intensos.";
-  if (diff > 4) return `Para subir ${diff} niveles en una sesión considera decoloración previa. El resultado será más limpio y duradero.`;
-  if (diff > 2 && g < 25) return `Necesitas aclarar ${diff} niveles. Usa oxidante 30 vol. y aplica de medios a puntas, raíces al final.`;
-  if (g >= 75 && tl < 5) return "Para canas abundantes en tonos oscuros, usa 50% tono deseado + 50% neutro para cobertura perfecta.";
-  if (color.trend) return "¡Tono trending 2025! Alta demanda. Considera ofrecerlo como servicio premium con tratamiento de brillo incluido.";
+function getSuggestion(color,base,grays){
+  if(!color||!base) return null;
+  const tl=parseFloat(color.id.split('.')[0])||5,b=parseInt(base)||0,diff=tl-b,g=parseInt(grays)||0;
+  if(color.id.startsWith('F.')||color.id.startsWith('G.')) return "Este tono requiere decoloración previa. Asegura nivel 9–10 antes de aplicar.";
+  if(color.id.startsWith('T.')) return "Los toners trabajan mejor sobre nivel 9–10. Verifica que no haya subtonos amarillos intensos.";
+  if(diff>4) return `Para subir ${diff} niveles considera decoloración previa. El resultado será más limpio y duradero.`;
+  if(diff>2&&g<25) return `Necesitas aclarar ${diff} niveles. Usa oxidante 30 vol. Aplica medios a puntas, raíces al final.`;
+  if(g>=75&&tl<5) return "Para canas abundantes en tonos oscuros: 50% tono deseado + 50% neutro para cobertura perfecta.";
+  if(color.trend) return "¡Tono trending 2025! Alta demanda. Considera ofrecerlo como servicio premium.";
   return null;
 }
 
-function getCompatibility(color, base) {
-  if (!color || !base) return null;
-  const tl = parseFloat(color.id.split('.')[0]) || 5;
-  const b  = parseInt(base);
-  const diff = Math.abs(tl - b);
-  if (color.id.startsWith('T.')||color.id.startsWith('F.')||color.id.startsWith('G.')) return b>=8?95:b>=6?60:30;
-  if (diff===0) return 98; if (diff===1) return 90; if (diff===2) return 78;
-  if (diff===3) return 62; if (diff===4) return 45; return 25;
+function getCompatibility(color,base){
+  if(!color||!base) return null;
+  const tl=parseFloat(color.id.split('.')[0])||5,b=parseInt(base),diff=Math.abs(tl-b);
+  if(color.id.startsWith('T.')||color.id.startsWith('F.')||color.id.startsWith('G.')) return b>=8?95:b>=6?60:30;
+  if(diff===0)return 98;if(diff===1)return 90;if(diff===2)return 78;if(diff===3)return 62;if(diff===4)return 45;return 25;
 }
 
-function onBaseChange() {
-  const base  = document.getElementById('baseHair').value;
-  const grays = document.getElementById('grays').value;
-  if (!selectedColor || !base) {
-    document.getElementById('compatWrap').style.display='none';
-    document.getElementById('suggBox').classList.remove('visible');
-    return;
-  }
-  const compat = getCompatibility(selectedColor, base);
-  if (compat !== null) {
+function onBaseChange(){
+  const base=document.getElementById('baseHair').value,grays=document.getElementById('grays').value;
+  if(!selectedColor||!base){document.getElementById('compatWrap').style.display='none';document.getElementById('suggBox').classList.remove('visible');return;}
+  const compat=getCompatibility(selectedColor,base);
+  if(compat!==null){
     document.getElementById('compatWrap').style.display='block';
-    document.getElementById('compatPct').textContent = compat>=80?`${compat}% — Excelente`:compat>=55?`${compat}% — Moderado`:`${compat}% — Requiere preparación`;
-    setTimeout(()=>{ document.getElementById('compatFill').style.width=compat+'%'; },50);
+    document.getElementById('compatPct').textContent=compat>=80?`${compat}% — Óptimo`:compat>=55?`${compat}% — Moderado`:`${compat}% — Requiere prep.`;
+    setTimeout(()=>{document.getElementById('compatFill').style.width=compat+'%';},50);
   }
-  const sug = getSuggestion(selectedColor, base, grays);
-  const sb = document.getElementById('suggBox');
-  if (sug) { document.getElementById('suggText').innerHTML=sug; sb.classList.add('visible'); }
+  const sug=getSuggestion(selectedColor,base,grays);
+  const sb=document.getElementById('suggBox');
+  if(sug){document.getElementById('suggText').innerHTML=sug;sb.classList.add('visible');}
   else sb.classList.remove('visible');
 }
 
-// ============================================================
-// CALCULAR
-// ============================================================
-function calculate() {
-  if (!selectedColor) { alert('Por favor selecciona un tono en la paleta.'); return; }
+// ── CALCULAR ──
+function calculate(){
+  if(!selectedColor){alert('Selecciona un tono en la paleta.');return;}
   const base=parseInt(document.getElementById('baseHair').value)||0;
   const grays=parseInt(document.getElementById('grays').value)||0;
   const tech=document.getElementById('technique').value;
@@ -757,46 +740,46 @@ function calculate() {
   const brand=document.getElementById('brand').value;
   const c=selectedColor;
 
-  let targetLevel=parseFloat(c.id.split('.')[0])||5;
-  let oxVol, levelDiff=targetLevel-base;
-  if (c.id.startsWith('T.')||c.id.startsWith('G.')||c.id.startsWith('F.')) oxVol=6;
-  else if (tech==='gloss') oxVol=9;
-  else if (tech==='toner') oxVol=6;
-  else if (grays>=75) oxVol=c.ox.includes(20)?20:c.ox[0];
-  else if (levelDiff<=0) oxVol=grays>=50?20:9;
-  else if (levelDiff<=2) oxVol=20;
-  else if (levelDiff<=4) oxVol=30;
+  let targetLevel=parseFloat(c.id.split('.')[0])||5,oxVol,levelDiff=targetLevel-base;
+  if(c.id.startsWith('T.')||c.id.startsWith('G.')||c.id.startsWith('F.')) oxVol=6;
+  else if(tech==='gloss') oxVol=9;
+  else if(tech==='toner') oxVol=6;
+  else if(grays>=75) oxVol=c.ox.includes(20)?20:c.ox[0];
+  else if(levelDiff<=0) oxVol=grays>=50?20:9;
+  else if(levelDiff<=2) oxVol=20;
+  else if(levelDiff<=4) oxVol=30;
   else oxVol=40;
-  if (!c.ox.includes(oxVol)) oxVol=c.ox.reduce((p,r)=>Math.abs(r-oxVol)<Math.abs(p-oxVol)?r:p);
-  if (hairType==='resistente'&&oxVol<40) oxVol=Math.min(40,oxVol+10);
-  if (hairType==='poroso'&&oxVol>9) oxVol=Math.max(9,oxVol-10);
-  if (!c.ox.includes(oxVol)) oxVol=c.ox.reduce((p,r)=>Math.abs(r-oxVol)<Math.abs(p-oxVol)?r:p);
+  if(!c.ox.includes(oxVol)) oxVol=c.ox.reduce((p,r)=>Math.abs(r-oxVol)<Math.abs(p-oxVol)?r:p);
+  if(hairType==='resistente'&&oxVol<40) oxVol=Math.min(40,oxVol+10);
+  if(hairType==='poroso'&&oxVol>9) oxVol=Math.max(9,oxVol-10);
+  if(!c.ox.includes(oxVol)) oxVol=c.ox.reduce((p,r)=>Math.abs(r-oxVol)<Math.abs(p-oxVol)?r:p);
 
-  let tintePct=tech==='gloss'?33:50, oxidPct=tech==='gloss'?67:50;
+  const tintePct=tech==='gloss'?33:50,oxidPct=tech==='gloss'?67:50;
   let extraMod=null;
-  if (grays>=50&&!c.mod.includes('neutro')) extraMod='neutro';
+  if(grays>=50&&!c.mod.includes('neutro')) extraMod='neutro';
   const mainMods=c.mod.slice(0,2);
-  if (extraMod&&!mainMods.includes(extraMod)) mainMods.push(extraMod);
+  if(extraMod&&!mainMods.includes(extraMod)) mainMods.push(extraMod);
 
   let formula=[];
-  if (mainMods.length===0) formula.push({key:'neutro',pct:100});
-  else if (mainMods.length===1) { formula.push({key:mainMods[0],pct:grays>=50?70:100}); if(grays>=50) formula.push({key:'neutro',pct:30}); }
-  else if (mainMods.length===2) { const p1=grays>=50?50:60,p2=grays>=50?30:40; formula.push({key:mainMods[0],pct:p1}); formula.push({key:mainMods[1],pct:p2}); if(grays>=50) formula.push({key:'neutro',pct:20}); }
-  else { formula.push({key:mainMods[0],pct:50}); formula.push({key:mainMods[1],pct:30}); formula.push({key:mainMods[2],pct:20}); }
+  if(mainMods.length===0) formula.push({key:'neutro',pct:100});
+  else if(mainMods.length===1){formula.push({key:mainMods[0],pct:grays>=50?70:100});if(grays>=50)formula.push({key:'neutro',pct:30});}
+  else if(mainMods.length===2){const p1=grays>=50?50:60,p2=grays>=50?30:40;formula.push({key:mainMods[0],pct:p1});formula.push({key:mainMods[1],pct:p2});if(grays>=50)formula.push({key:'neutro',pct:20});}
+  else{formula.push({key:mainMods[0],pct:50});formula.push({key:mainMods[1],pct:30});formula.push({key:mainMods[2],pct:20});}
 
   const sum=formula.reduce((a,b)=>a+b.pct,0);
-  formula.forEach(f=>{f.pct=Math.round(f.pct/sum*100); if(!mods[f.key]) f.key='neutro';});
+  formula.forEach(f=>{f.pct=Math.round(f.pct/sum*100);if(!mods[f.key])f.key='neutro';});
 
   let adjTime=time;
-  if (hairType==='poroso') adjTime=Math.max(20,time-5);
-  if (hairType==='resistente') adjTime=time+10;
+  if(hairType==='poroso') adjTime=Math.max(20,time-5);
+  if(hairType==='resistente') adjTime=time+10;
 
   document.getElementById('emptyCard').classList.remove('visible');
   const rc=document.getElementById('resultCard');
-  rc.classList.remove('visible'); void rc.offsetWidth; rc.classList.add('visible');
+  rc.classList.remove('visible');void rc.offsetWidth;rc.classList.add('visible');
+
   document.getElementById('resColor').style.background=c.hex;
   document.getElementById('resName').textContent=c.name;
-  document.getElementById('resDesc').textContent=`Código: ${c.code}  ·  Oxidante: ${oxVol} vol.  ·  Tiempo: ${adjTime} min`;
+  document.getElementById('resDesc').textContent=`${c.code}  ·  OX: ${oxVol} vol.  ·  ${adjTime} min`;
 
   const rows=document.getElementById('formulaRows');
   rows.innerHTML='';
@@ -804,95 +787,79 @@ function calculate() {
     const m=mods[f.key]||mods['neutro'];
     rows.innerHTML+=`<div class="formula-row"><div class="formula-color-dot" style="background:${m.hex}"></div><div class="formula-text"><div class="fname">${m.name}</div><div class="fcode">${m.desc}</div></div><div><div class="formula-bar-wrap"><div class="formula-bar" style="width:${f.pct}%"></div></div></div><div class="formula-pct">${f.pct}%</div></div>`;
   });
+
   const ox=oxidantes[oxVol]||oxidantes[20];
   document.getElementById('oxidTitle').textContent=ox.name;
   document.getElementById('oxidDesc').textContent=ox.use;
   document.getElementById('amountsGrid').innerHTML=`
     <div class="amount-cell"><div class="av">${tech==='gloss'?'1 parte':'1 parte'}</div><div class="al">Tinte</div></div>
     <div class="amount-cell"><div class="av">${tech==='gloss'?'2 partes':'1 parte'}</div><div class="al">Oxidante ${oxVol} vol.</div></div>
-    <div class="amount-cell"><div class="av">${tech==='gloss'?'1 : 2':'1 : 1'}</div><div class="al">Proporción</div></div>`;
+    <div class="amount-cell"><div class="av">${tech==='gloss'?'1:2':'1:1'}</div><div class="al">Proporción</div></div>`;
 
   const bN={generic:"Universal",wella:"Wella Koleston",loreal:"L'Oréal Majirel",igora:"Schwarzkopf Igora",redken:"Redken Chromatics",matrix:"Matrix SoColor",keune:"Keune Tinta"};
   const hL={normal:"Normal",poroso:"Poroso/Dañado",resistente:"Resistente",fino:"Fino/Delicado",rizado:"Rizado/Afro"};
   const tL={full:"Coloración completa",roots:"Solo raíces",balayage:"Balayage",gloss:"Gloss",toner:"Toner",highlights:"Highlights",ombre:"Ombré"};
   const compat=getCompatibility(c,String(base))||0;
-  const compatLabel=compat>=80?'🟢 Excelente':compat>=55?'🟡 Moderada':'🔴 Requiere prep.';
+  const compatLabel=compat>=80?'◈ Óptimo':compat>=55?'◈ Moderado':'◈ Requiere prep.';
   document.getElementById('proGrid').innerHTML=`
     <div class="pro-item"><div class="pi-label">Línea</div><div class="pi-val">${bN[brand]||brand}</div></div>
-    <div class="pro-item"><div class="pi-label">Tiempo ajustado</div><div class="pi-val">${adjTime} min</div></div>
+    <div class="pro-item"><div class="pi-label">Tiempo</div><div class="pi-val">${adjTime} min</div></div>
     <div class="pro-item"><div class="pi-label">Técnica</div><div class="pi-val">${tL[tech]||tech}</div></div>
-    <div class="pro-item"><div class="pi-label">Tipo cabello</div><div class="pi-val">${hL[hairType]||hairType}</div></div>
+    <div class="pro-item"><div class="pi-label">Cabello</div><div class="pi-val">${hL[hairType]||hairType}</div></div>
     <div class="pro-item"><div class="pi-label">Compatibilidad</div><div class="pi-val">${compatLabel}</div></div>
-    <div class="pro-item"><div class="pi-label">Proporción</div><div class="pi-val">Tinte ${tintePct}% / Ox. ${oxidPct}%</div></div>`;
+    <div class="pro-item"><div class="pi-label">Proporción</div><div class="pi-val">T ${tintePct}% / Ox ${oxidPct}%</div></div>`;
 
   const techTip=techTips[tech]||'';
   const htTip=hairTypeTips[hairType]||'';
-  const grayTip=grays>=50?' <strong>Canas:</strong> Se añadió neutro para cobertura completa. Aplica raíz primero.':'';
-  let tipHTML=`💡 <strong>Técnica:</strong> ${techTip}`;
+  const grayTip=grays>=50?' <strong>Canas:</strong> Se añadió neutro para cobertura completa.':'';
+  let tipHTML=`⚡ <strong>Técnica:</strong> ${techTip}`;
   if(htTip) tipHTML+=`<br><br>${htTip}`;
   if(grayTip) tipHTML+=`<br><br>${grayTip}`;
   document.getElementById('tipBox').innerHTML=tipHTML;
   rc.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-// ============================================================
-// ESTRELLA DE COLOR
-// ============================================================
-function renderStarButtons() {
-  const container = document.getElementById('colorButtons');
-  container.innerHTML = '';
-  for (const [key, d] of Object.entries(starData)) {
-    const btn = document.createElement('button');
-    btn.className = 'col-btn';
-    btn.dataset.color = key;
-    btn.innerHTML = `<span class="cb-dot" style="background:${d.hex}"></span>${d.label}`;
-    btn.addEventListener('click', () => showNeutralizer(key));
+// ── ESTRELLA DE COLOR ──
+function renderStarButtons(){
+  const container=document.getElementById('colorButtons');
+  container.innerHTML='';
+  for(const[key,d]of Object.entries(starData)){
+    const btn=document.createElement('button');
+    btn.className='col-btn';btn.dataset.color=key;
+    btn.innerHTML=`<span class="cb-dot" style="background:${d.hex}"></span>${d.label}`;
+    btn.addEventListener('click',()=>showNeutralizer(key));
     container.appendChild(btn);
   }
 }
 
-function showNeutralizer(colorKey) {
-  const d = starData[colorKey];
-  if (!d) return;
+function showNeutralizer(colorKey){
+  const d=starData[colorKey];if(!d)return;
+  document.querySelectorAll('.star-seg').forEach(s=>s.classList.remove('active-seg'));
+  const seg=document.getElementById('seg-'+colorKey);if(seg)seg.classList.add('active-seg');
+  document.querySelectorAll('.col-btn').forEach(b=>b.classList.remove('active'));
+  const btn=document.querySelector(`.col-btn[data-color="${colorKey}"]`);if(btn)btn.classList.add('active');
 
-  // Highlight SVG segment
-  document.querySelectorAll('.star-seg').forEach(s => s.classList.remove('active-seg'));
-  const seg = document.getElementById('seg-' + colorKey);
-  if (seg) seg.classList.add('active-seg');
-
-  // Highlight button
-  document.querySelectorAll('.col-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.querySelector(`.col-btn[data-color="${colorKey}"]`);
-  if (btn) btn.classList.add('active');
-
-  const panel = document.getElementById('neutResult');
-  panel.innerHTML = `
-    <div class="neut-title">Corrección: ${d.label}</div>
+  document.getElementById('neutResult').innerHTML=`
+    <div class="neut-title">◈ Corrección: ${d.label}</div>
     <div class="neut-pair">
       <div class="neut-dot" style="background:${d.hex}"></div>
       <div class="neut-arrow">→</div>
-      <div class="neut-dot" style="background:${d.neutHex};box-shadow:0 0 12px ${d.neutHex}44"></div>
+      <div class="neut-dot" style="background:${d.neutHex};box-shadow:0 0 14px ${d.neutHex}88"></div>
       <div class="neut-text">
         <h4>Neutralizador: ${d.neutralizer}</h4>
-        <p>Código: <strong style="color:var(--gold-light)">${d.neutCode}</strong></p>
+        <p>Código: <strong style="color:var(--gold)">${d.neutCode}</strong></p>
       </div>
     </div>
-    <div style="font-size:0.78rem;color:var(--muted);line-height:1.55;"><strong style="color:var(--text)">¿Dónde aparece?</strong> ${d.where}</div>
-    <div class="neut-formula">📐 <strong>Fórmula de corrección:</strong><br>${d.formula}</div>
-    <div style="font-size:0.72rem;color:var(--muted);margin-top:0.2rem;">Común en: ${d.commonIn.join(' · ')}</div>`;
+    <div style="font-size:0.76rem;color:var(--muted);line-height:1.6;"><strong style="color:var(--text);font-family:'Orbitron',sans-serif;font-size:0.6rem;letter-spacing:0.1em;">¿DÓNDE APARECE?</strong><br>${d.where}</div>
+    <div class="neut-formula">◈ <strong>Fórmula de corrección:</strong><br>${d.formula}</div>
+    <div style="font-size:0.68rem;color:var(--muted);font-family:'Orbitron',sans-serif;letter-spacing:0.06em;">COMÚN EN: ${d.commonIn.join(' · ')}</div>`;
 }
 
-// Click en segmentos SVG
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.star-seg').forEach(seg => {
-    seg.addEventListener('click', () => showNeutralizer(seg.dataset.color));
-  });
+document.addEventListener('DOMContentLoaded',()=>{
+  document.querySelectorAll('.star-seg').forEach(seg=>seg.addEventListener('click',()=>showNeutralizer(seg.dataset.color)));
   renderStarButtons();
 });
 
-// ============================================================
-// INIT
-// ============================================================
 renderPalette();
 </script>
 </body>
